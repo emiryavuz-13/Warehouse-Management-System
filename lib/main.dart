@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'app/app.dart';
+import 'app/providers/retry_policy.dart';
 
 /// Uygulamanın giriş noktası.
 ///
@@ -15,5 +16,9 @@ Future<void> main() async {
   // Formatters sınıfındaki tüm DateFormat örnekleri buna bağlıdır.
   await initializeDateFormatting('tr_TR');
 
-  runApp(const ProviderScope(child: WarehouseApp()));
+  // Riverpod 3 basarisiz provider'lari varsayilan olarak yeniden dener ve
+  // hata ~38 saniye gecikmeyle yuzeye cikar. Bkz. retry_policy.dart.
+  runApp(
+    ProviderScope(retry: noRetryPolicy, child: const WarehouseApp()),
+  );
 }

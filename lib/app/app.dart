@@ -1,28 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../core/constants/app_constants.dart';
+import 'router.dart';
 import 'theme/app_theme.dart';
 import 'theme/theme_mode_controller.dart';
 
 /// Uygulamanın kökü.
 ///
 /// Tek sorumluluğu tema, dil ve navigasyonu kurmak; hiçbir iş mantığı
-/// içermez. Navigasyon 5. commit'te `router.dart` ile buraya bağlanacak.
+/// içermez.
 class WarehouseApp extends ConsumerWidget {
   const WarehouseApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeMode themeMode = ref.watch(themeModeProvider);
+    final GoRouter router = ref.watch(routerProvider);
 
-    return MaterialApp(
+    return MaterialApp.router(
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: themeMode,
+      routerConfig: router,
 
       // Uygulama tamamen Türkçedir; Material bileşenlerinin (tarih seçici,
       // metin alanı menüleri vb.) de Türkçe görünmesi için gereklidir.
@@ -34,29 +38,20 @@ class WarehouseApp extends ConsumerWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
 
-      home: const _ThemePreviewPage(),
-    );
-  }
-}
-
-/// Geçici açılış sayfası.
-///
-/// Temanın kurulduğunu doğrulamak için vardır; 5. commit'te `AppRouter` ile
-/// değiştirilecektir.
-class _ThemePreviewPage extends StatelessWidget {
-  const _ThemePreviewPage();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text(AppConstants.appName)),
-      body: Center(
-        child: Text(
-          'Altyapı hazır.\nEkranlar sıradaki commitlerde eklenecek.',
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
-      ),
+      // Operasyonel ekranlarda okunabilirlik önemli: cihazın yazı tipi
+      // ölçeği çok büyükse kartlardaki sayılar ve etiketler taşar.
+      builder: (BuildContext context, Widget? child) {
+        final MediaQueryData media = MediaQuery.of(context);
+        return MediaQuery(
+          data: media.copyWith(
+            textScaler: media.textScaler.clamp(
+              minScaleFactor: 0.9,
+              maxScaleFactor: 1.3,
+            ),
+          ),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
   }
 }
