@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/widgets/module_placeholder.dart';
+import '../features/counts/presentation/count_detail_page.dart';
+import '../features/counts/presentation/counts_page.dart';
 import '../features/dashboard/presentation/dashboard_page.dart';
 import '../features/products/presentation/product_detail_page.dart';
 import '../features/products/presentation/product_list_page.dart';
@@ -232,16 +234,13 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         path: AppRoutes.counts,
         name: AppRouteNames.counts,
         builder: (BuildContext context, GoRouterState state) =>
-            const ModulePlaceholder(title: 'Stok Sayımı', icon: AppIcons.count),
+            const CountsPage(),
         routes: <RouteBase>[
           GoRoute(
             path: ':countId',
             name: AppRouteNames.countDetail,
             builder: (BuildContext context, GoRouterState state) =>
-                const ModulePlaceholder(
-                  title: 'Sayım Detayı',
-                  icon: AppIcons.count,
-                ),
+                CountDetailPage(countId: state.pathParameters['countId']!),
           ),
         ],
       ),

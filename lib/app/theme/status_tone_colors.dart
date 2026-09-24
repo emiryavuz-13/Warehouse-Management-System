@@ -142,6 +142,7 @@ abstract final class AppIcons {
   static const IconData calendar = LucideIcons.calendarDays;
   static const IconData radioSelected = LucideIcons.circleDot;
   static const IconData radioUnselected = LucideIcons.circle;
+  static const IconData edit = LucideIcons.pencil;
   static const IconData expand = LucideIcons.chevronDown;
   static const IconData collapse = LucideIcons.chevronUp;
 

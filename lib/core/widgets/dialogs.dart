@@ -149,19 +149,37 @@ class ConfirmationDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppStatusColors status = Theme.of(context).status;
 
+    // Her iki taraf da uzun olabiliyor: etiket bir ürün adı ("iPhone 15
+    // 128GB Siyah"), değer bir yol ("A-01-01 → B-03-02") olabilir. İkisini
+    // de sabit bırakmak satırı taşırıyordu.
+    //
+    // Etiket esnektir ve kısaysa daha az yer kaplar; değer `Expanded` ile
+    // payını tam doldurur, böylece sağa hizalama her satırda korunur. İkisi
+    // de gerekirse iki satıra iner, hiçbir koşulda taşmaz.
+    //
+    // `LayoutBuilder` kullanılamaz: `AlertDialog` içeriğinin genişliğini
+    // intrinsic ölçümle hesaplıyor ve `LayoutBuilder` bunu desteklemiyor.
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodySmall
-              ?.copyWith(color: status.neutral),
+        Flexible(
+          flex: 4,
+          child: Text(
+            label,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(color: status.neutral),
+          ),
         ),
         const SizedBox(width: AppSpacing.md),
         Expanded(
+          flex: 6,
           child: Text(
             value,
             textAlign: TextAlign.right,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.bodyMedium
                 ?.copyWith(fontWeight: FontWeight.w600, color: valueColor),
           ),
