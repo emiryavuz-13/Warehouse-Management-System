@@ -202,6 +202,7 @@ class TaskProgressBar extends StatelessWidget {
     required this.total,
     this.label,
     this.tone,
+    this.showCount = true,
     super.key,
   });
 
@@ -209,6 +210,10 @@ class TaskProgressBar extends StatelessWidget {
   final int total;
   final String? label;
   final Color? tone;
+
+  /// Sayıyı gizler. Çubuğun hemen yanında zaten "120 / 240" yazan bir
+  /// satır varsa aynı sayıyı iki kez göstermek gürültüdür.
+  final bool showCount;
 
   @override
   Widget build(BuildContext context) {
@@ -233,14 +238,17 @@ class TaskProgressBar extends StatelessWidget {
               )
             else
               const Spacer(),
-            Text(
-              '$completed / $total',
-              style: Theme.of(context).textTheme.bodySmall
-                  ?.copyWith(fontWeight: FontWeight.w700, color: color),
-            ),
+            if (showCount)
+              Text(
+                '$completed / $total',
+                style: Theme.of(context).textTheme.bodySmall
+                    ?.copyWith(fontWeight: FontWeight.w700, color: color),
+              ),
           ],
         ),
-        const SizedBox(height: AppSpacing.sm - 2),
+        // Etiket de sayı da yoksa üstte boş satır bırakma.
+        if (label != null || showCount)
+          const SizedBox(height: AppSpacing.sm - 2),
         // Uzunluk değişimi animasyonlu: kullanıcı ilerlediğini hissetmeli
         // (şartname 33. bölüm, "picking ilerleme animasyonu").
         TweenAnimationBuilder<double>(

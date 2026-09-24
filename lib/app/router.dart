@@ -6,6 +6,9 @@ import '../core/widgets/module_placeholder.dart';
 import '../features/dashboard/presentation/dashboard_page.dart';
 import '../features/products/presentation/product_detail_page.dart';
 import '../features/products/presentation/product_list_page.dart';
+import '../features/receiving/presentation/putaway_page.dart';
+import '../features/receiving/presentation/receipt_detail_page.dart';
+import '../features/receiving/presentation/receiving_list_page.dart';
 import '../features/scan/presentation/scan_page.dart';
 import '../features/scan/presentation/scan_result_page.dart';
 import '../features/shell/presentation/app_shell.dart';
@@ -166,27 +169,23 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         path: AppRoutes.receiving,
         name: AppRouteNames.receiving,
         builder: (BuildContext context, GoRouterState state) =>
-            const ModulePlaceholder(
-              title: 'Mal Kabul',
-              icon: AppIcons.receiving,
-            ),
+            const ReceivingListPage(),
         routes: <RouteBase>[
           GoRoute(
             path: ':receiptId',
             name: AppRouteNames.receiptDetail,
             builder: (BuildContext context, GoRouterState state) =>
-                const ModulePlaceholder(
-                  title: 'Mal Kabul Detayı',
-                  icon: AppIcons.receiving,
+                ReceiptDetailPage(
+                  receiptId: state.pathParameters['receiptId']!,
                 ),
             routes: <RouteBase>[
               GoRoute(
                 path: 'putaway',
                 name: AppRouteNames.putaway,
                 builder: (BuildContext context, GoRouterState state) =>
-                    const ModulePlaceholder(
-                      title: 'Ürün Yerleştirme',
-                      icon: AppIcons.locations,
+                    PutawayPage(
+                      receiptId: state.pathParameters['receiptId']!,
+                      productId: state.uri.queryParameters['productId'] ?? '',
                     ),
               ),
             ],

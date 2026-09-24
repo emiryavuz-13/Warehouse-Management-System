@@ -139,6 +139,9 @@ abstract final class AppIcons {
   static const IconData confirm = LucideIcons.check;
   static const IconData refresh = LucideIcons.refreshCw;
   static const IconData barcode = LucideIcons.barcode;
+  static const IconData calendar = LucideIcons.calendarDays;
+  static const IconData radioSelected = LucideIcons.circleDot;
+  static const IconData radioUnselected = LucideIcons.circle;
   static const IconData expand = LucideIcons.chevronDown;
   static const IconData collapse = LucideIcons.chevronUp;
 

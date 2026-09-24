@@ -36,7 +36,10 @@ abstract final class AppRoutes {
   // --- Mal kabul ve yerleştirme (şartname 11-12. bölümler) ---
   static const String receiving = '/receiving';
   static String receiptDetail(String receiptId) => '/receiving/$receiptId';
-  static String putaway(String receiptId) => '/receiving/$receiptId/putaway';
+  /// Yerleştirme ekranı tek bir satır için açılır; ürün sorgu
+  /// parametresiyle taşınır.
+  static String putaway(String receiptId, String productId) =>
+      '/receiving/$receiptId/putaway?productId=${Uri.encodeComponent(productId)}';
 
   // --- Sipariş ve toplama (şartname 13-14. bölümler) ---
   static String orderDetail(String orderId) => '/orders/$orderId';
