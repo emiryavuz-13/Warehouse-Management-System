@@ -57,6 +57,10 @@ dependencies:
   # Tema tercihinin cihazda saklanmasi
   shared_preferences: ^2.5.5
 
+  # Model siniflarinda deger esitligi - 18 model icin elle == / hashCode
+  # yazmak yerine props listesi yeterli olur
+  equatable: ^2.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
