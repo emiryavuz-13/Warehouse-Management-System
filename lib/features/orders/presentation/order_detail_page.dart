@@ -13,6 +13,7 @@ import '../../../core/widgets/widgets.dart';
 import '../../../data/views.dart';
 import '../../../data/warehouse_exception.dart';
 import '../../../models/models.dart';
+import '../../shipments/presentation/widgets/ship_action.dart';
 import '../providers/order_providers.dart';
 
 /// Sipariş detayı (şartname 13. bölüm).
@@ -79,7 +80,11 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
           PrimaryButton(
             label: 'Sevkiyata Geç',
             icon: AppIcons.shipment,
-            onPressed: () => context.push(AppRoutes.shipments),
+            onPressed: () => openShipmentForOrder(
+              context: context,
+              ref: ref,
+              orderId: widget.orderId,
+            ),
           ),
         ],
       );

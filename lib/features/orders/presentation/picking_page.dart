@@ -13,6 +13,7 @@ import '../../../core/widgets/widgets.dart';
 import '../../../data/views.dart';
 import '../../../data/warehouse_exception.dart';
 import '../../../models/models.dart';
+import '../../shipments/presentation/widgets/ship_action.dart';
 import '../providers/order_providers.dart';
 
 /// Toplama görevi (şartname 14. bölüm).
@@ -429,7 +430,11 @@ class _PickingComplete extends ConsumerWidget {
             PrimaryButton(
               label: 'Sevkiyata Geç',
               icon: AppIcons.shipment,
-              onPressed: () => context.push(AppRoutes.shipments),
+              onPressed: () => openShipmentForOrder(
+                context: context,
+                ref: ref,
+                orderId: orderId,
+              ),
             ),
             const SizedBox(height: AppSpacing.sm),
             SecondaryButton(

@@ -19,6 +19,8 @@ import '../features/receiving/presentation/receiving_list_page.dart';
 import '../features/scan/presentation/scan_page.dart';
 import '../features/scan/presentation/scan_result_page.dart';
 import '../features/shell/presentation/app_shell.dart';
+import '../features/shipments/presentation/shipment_detail_page.dart';
+import '../features/shipments/presentation/shipments_page.dart';
 import '../features/splash/presentation/splash_page.dart';
 import '../features/transfer/presentation/transfer_page.dart';
 import '../features/stock/presentation/stock_list_page.dart';
@@ -240,15 +242,14 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         path: AppRoutes.shipments,
         name: AppRouteNames.shipments,
         builder: (BuildContext context, GoRouterState state) =>
-            const ModulePlaceholder(title: 'Sevkiyat', icon: AppIcons.shipment),
+            const ShipmentsPage(),
         routes: <RouteBase>[
           GoRoute(
             path: ':shipmentId',
             name: AppRouteNames.shipmentDetail,
             builder: (BuildContext context, GoRouterState state) =>
-                const ModulePlaceholder(
-                  title: 'Sevkiyat Detayı',
-                  icon: AppIcons.shipment,
+                ShipmentDetailPage(
+                  shipmentId: state.pathParameters['shipmentId']!,
                 ),
           ),
         ],
