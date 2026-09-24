@@ -506,7 +506,7 @@ class WarehouseDatabase {
       quantity: -quantity,
       type: MovementType.pick,
       userId: userId,
-      reference: 'Sipariş #${order.orderNumber}',
+      reference: '#${order.orderNumber}',
       sourceLocationId: line.locationId,
     );
 

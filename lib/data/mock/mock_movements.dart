@@ -23,7 +23,7 @@ abstract final class MockMovements {
       type: MovementType.returned,
       userId: 'usr-02',
       timestamp: now.subtract(const Duration(hours: 1, minutes: 15)),
-      reference: 'İade · Deniz Bilişim',
+      reference: 'Deniz Bilişim',
       targetLocationId: 'loc-a0201',
       note: 'Ambalajı açılmamış, tekrar satışa uygun.',
     ),
@@ -45,7 +45,7 @@ abstract final class MockMovements {
       type: MovementType.pick,
       userId: 'usr-02',
       timestamp: now.subtract(const Duration(hours: 3, minutes: 25)),
-      reference: 'Sipariş #10461',
+      reference: '#10461',
       sourceLocationId: 'loc-c0201',
     ),
     StockMovement(
@@ -100,7 +100,7 @@ abstract final class MockMovements {
       type: MovementType.pick,
       userId: 'usr-01',
       timestamp: now.subtract(const Duration(hours: 22)),
-      reference: 'Sipariş #10455',
+      reference: '#10455',
       sourceLocationId: 'loc-a0101',
     ),
     StockMovement(
@@ -110,7 +110,7 @@ abstract final class MockMovements {
       type: MovementType.pick,
       userId: 'usr-01',
       timestamp: now.subtract(const Duration(hours: 22, minutes: 5)),
-      reference: 'Sipariş #10455',
+      reference: '#10455',
       sourceLocationId: 'loc-c0201',
     ),
     StockMovement(
@@ -130,7 +130,7 @@ abstract final class MockMovements {
       type: MovementType.pick,
       userId: 'usr-02',
       timestamp: now.subtract(const Duration(days: 1, hours: 3)),
-      reference: 'Sipariş #10456',
+      reference: '#10456',
       sourceLocationId: 'loc-b0101',
     ),
     StockMovement(
@@ -152,7 +152,7 @@ abstract final class MockMovements {
       type: MovementType.shipment,
       userId: 'usr-01',
       timestamp: now.subtract(const Duration(days: 1, hours: 6)),
-      reference: 'SH-2026-012 · Sipariş #10457',
+      reference: 'SH-2026-012 · #10457',
       sourceLocationId: 'loc-c0101',
     ),
     StockMovement(
@@ -162,7 +162,7 @@ abstract final class MockMovements {
       type: MovementType.shipment,
       userId: 'usr-01',
       timestamp: now.subtract(const Duration(days: 1, hours: 6)),
-      reference: 'SH-2026-012 · Sipariş #10457',
+      reference: 'SH-2026-012 · #10457',
       sourceLocationId: 'loc-c0201',
     ),
 
@@ -184,7 +184,7 @@ abstract final class MockMovements {
       type: MovementType.shipment,
       userId: 'usr-02',
       timestamp: now.subtract(const Duration(days: 2, hours: 3, minutes: 20)),
-      reference: 'SH-2026-011 · Sipariş #10458',
+      reference: 'SH-2026-011 · #10458',
       sourceLocationId: 'loc-b0102',
     ),
     StockMovement(
@@ -205,7 +205,7 @@ abstract final class MockMovements {
       type: MovementType.pick,
       userId: 'usr-01',
       timestamp: now.subtract(const Duration(days: 2, hours: 7)),
-      reference: 'Sipariş #10448',
+      reference: '#10448',
       sourceLocationId: 'loc-c0101',
     ),
     StockMovement(
@@ -237,7 +237,7 @@ abstract final class MockMovements {
       type: MovementType.pick,
       userId: 'usr-02',
       timestamp: now.subtract(const Duration(days: 3, hours: 6)),
-      reference: 'Sipariş #10445',
+      reference: '#10445',
       sourceLocationId: 'loc-c0101',
     ),
     StockMovement(
@@ -270,7 +270,7 @@ abstract final class MockMovements {
       type: MovementType.pick,
       userId: 'usr-02',
       timestamp: now.subtract(const Duration(days: 4, hours: 7)),
-      reference: 'Sipariş #10440',
+      reference: '#10440',
       sourceLocationId: 'loc-a0201',
     ),
     StockMovement(
@@ -280,7 +280,7 @@ abstract final class MockMovements {
       type: MovementType.returned,
       userId: 'usr-03',
       timestamp: now.subtract(const Duration(days: 5, hours: 3)),
-      reference: 'İade · Ege Bilgisayar',
+      reference: 'Ege Bilgisayar',
       targetLocationId: 'loc-c0201',
     ),
     StockMovement(

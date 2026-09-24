@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/widgets/module_placeholder.dart';
+import '../features/dashboard/presentation/dashboard_page.dart';
 import '../features/shell/presentation/app_shell.dart';
 import '../features/splash/presentation/splash_page.dart';
 import 'routes.dart';
@@ -55,14 +56,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                 path: AppRoutes.dashboard,
                 name: AppRouteNames.dashboard,
                 builder: (BuildContext context, GoRouterState state) =>
-                    const ModulePlaceholder(
-                      title: 'Ana Sayfa',
-                      icon: AppIcons.dashboard,
-                      description:
-                          'Dashboard, özet kartları ve hızlı işlemler '
-                          'sıradaki adımda eklenecek.',
-                      showAppBar: false,
-                    ),
+                    const DashboardPage(),
               ),
             ],
           ),

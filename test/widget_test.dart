@@ -114,12 +114,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(NavigationBar), findsOneWidget);
-    expect(
-      find.text(
-        'Dashboard, özet kartları ve hızlı işlemler sıradaki adımda '
-        'eklenecek.',
-      ),
-      findsOneWidget,
-    );
+    // Dashboard'a geri dönüldü: karşılama başlığı yeniden görünür.
+    expect(find.textContaining('Merhaba'), findsOneWidget);
   });
 }
