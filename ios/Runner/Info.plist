@@ -4,6 +4,10 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<!-- Barkod tarama (şartname 10. bölüm). İzin reddedilirse uygulama
+	     demo barkod listesine düşer, çalışmayı sürdürür. -->
+	<key>NSCameraUsageDescription</key>
+	<string>Ürün barkodlarını okumak için kamera kullanılır.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

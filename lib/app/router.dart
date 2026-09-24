@@ -6,6 +6,8 @@ import '../core/widgets/module_placeholder.dart';
 import '../features/dashboard/presentation/dashboard_page.dart';
 import '../features/products/presentation/product_detail_page.dart';
 import '../features/products/presentation/product_list_page.dart';
+import '../features/scan/presentation/scan_page.dart';
+import '../features/scan/presentation/scan_result_page.dart';
 import '../features/shell/presentation/app_shell.dart';
 import '../features/splash/presentation/splash_page.dart';
 import '../features/stock/presentation/stock_list_page.dart';
@@ -83,14 +85,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                 path: AppRoutes.scan,
                 name: AppRouteNames.scan,
                 builder: (BuildContext context, GoRouterState state) =>
-                    const ModulePlaceholder(
-                      title: 'Barkod Tara',
-                      icon: AppIcons.scan,
-                      description:
-                          'Kamera ile tarama ve demo barkod listesi '
-                          'sıradaki adımlarda eklenecek.',
-                      showAppBar: false,
-                    ),
+                    const ScanPage(),
               ),
             ],
           ),
@@ -138,6 +133,15 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
       // ---------------------------------------------------------------------
       // Kabuğun üzerine itilen ekranlar
       // ---------------------------------------------------------------------
+
+      // Tarama sonucu (şartname 10. bölüm)
+      GoRoute(
+        path: AppRoutes.scanResultPath,
+        name: AppRouteNames.scanResult,
+        builder: (BuildContext context, GoRouterState state) => ScanResultPage(
+          barcode: state.uri.queryParameters['barcode'] ?? '',
+        ),
+      ),
 
       // Ürünler (şartname 8. bölüm)
       GoRoute(

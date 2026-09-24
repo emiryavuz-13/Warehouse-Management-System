@@ -1,4 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Barkod tarama (şartname 10. bölüm). Kamera zorunlu değildir:
+         cihazda kamera yoksa ya da izin verilmezse uygulama demo barkod
+         listesine düşer, kurulumu engellememeli. -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-feature android:name="android.hardware.camera" android:required="false"/>
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
+
     <application
         android:label="Depo Yönetimi"
         android:name="${applicationName}"

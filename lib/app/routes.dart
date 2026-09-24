@@ -17,6 +17,18 @@ abstract final class AppRoutes {
   static const String scan = '/scan';
   static const String profile = '/profile';
 
+  // --- Tarama sonucu (şartname 10. bölüm) ---
+
+  /// Sonuç ekranı kabuğun üzerine tam ekran açılır: tarama tek bir işe
+  /// odaklanma anıdır, bottom bar yarım kalmış bir akıştan kazara çıkmayı
+  /// kolaylaştırır.
+  static const String scanResultPath = '/scan-result';
+
+  /// Taranan kod sorgu parametresiyle taşınır; böylece sonuç ekranı kendi
+  /// başına adreslenebilir ve yeniden çizildiğinde aynı sonucu gösterir.
+  static String scanResult(String barcode) =>
+      '$scanResultPath?barcode=${Uri.encodeComponent(barcode)}';
+
   // --- Ürünler (şartname 8. bölüm) ---
   static const String products = '/products';
   static String productDetail(String productId) => '/products/$productId';
@@ -69,6 +81,7 @@ abstract final class AppRouteNames {
   static const String stock = 'stock';
   static const String orders = 'orders';
   static const String scan = 'scan';
+  static const String scanResult = 'scanResult';
   static const String profile = 'profile';
   static const String products = 'products';
   static const String productDetail = 'productDetail';
