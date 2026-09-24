@@ -13,6 +13,7 @@ import '../features/scan/presentation/scan_page.dart';
 import '../features/scan/presentation/scan_result_page.dart';
 import '../features/shell/presentation/app_shell.dart';
 import '../features/splash/presentation/splash_page.dart';
+import '../features/transfer/presentation/transfer_page.dart';
 import '../features/stock/presentation/stock_list_page.dart';
 import 'routes.dart';
 import 'theme/status_tone_colors.dart';
@@ -219,11 +220,9 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
       GoRoute(
         path: AppRoutes.transfer,
         name: AppRouteNames.transfer,
-        builder: (BuildContext context, GoRouterState state) =>
-            const ModulePlaceholder(
-              title: 'Stok Transferi',
-              icon: AppIcons.transfer,
-            ),
+        builder: (BuildContext context, GoRouterState state) => TransferPage(
+          initialProductId: state.uri.queryParameters['productId'],
+        ),
       ),
 
       // Sayım (şartname 16. bölüm)
