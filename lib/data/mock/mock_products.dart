@@ -1,0 +1,186 @@
+import '../../models/models.dart';
+
+/// Ürün kataloğu — 15 ürün, 4 kategoriye dağılmış.
+///
+/// [Product.minStock] değerleri bilinçli olarak çeşitlidir: mock stok
+/// miktarlarıyla birlikte Normal / Kritik / Stok Yok durumlarının üçü de
+/// uygulamada görünür (şartname 23. bölüm).
+///
+/// İlk dört ürünün barkodu şartname 10. bölümündeki demo barkodlarıyla
+/// birebir eşleşir; tarayıcı ekranındaki demo listesi bunlara dayanır.
+abstract final class MockProducts {
+  static const List<Product> all = <Product>[
+    // --- Telefon & Tablet ---
+    Product(
+      id: 'p-01',
+      sku: 'IP15-128-BLK',
+      name: 'iPhone 15 128GB Siyah',
+      barcode: '8691234567890',
+      brand: 'Apple',
+      categoryId: 'c-01',
+      unit: 'adet',
+      minStock: 10,
+      description: '6.1" Super Retina XDR, A16 Bionic',
+    ),
+    Product(
+      id: 'p-02',
+      sku: 'IP15P-256-TIT',
+      name: 'iPhone 15 Pro 256GB Titanyum',
+      barcode: '8691234567894',
+      brand: 'Apple',
+      categoryId: 'c-01',
+      unit: 'adet',
+      minStock: 8,
+      description: '6.1" ProMotion, A17 Pro',
+    ),
+    Product(
+      id: 'p-03',
+      sku: 'SGS24-256-GRY',
+      name: 'Samsung Galaxy S24 256GB',
+      barcode: '8691234567895',
+      brand: 'Samsung',
+      categoryId: 'c-01',
+      unit: 'adet',
+      minStock: 8,
+      description: '6.2" Dynamic AMOLED 2X',
+    ),
+    Product(
+      id: 'p-04',
+      sku: 'IPAD-A11-64',
+      name: 'iPad Air 11" 64GB',
+      barcode: '8691234567896',
+      brand: 'Apple',
+      categoryId: 'c-01',
+      unit: 'adet',
+      minStock: 5,
+      description: 'M2 çip, Wi-Fi',
+    ),
+
+    // --- Bilgisayar ---
+    Product(
+      id: 'p-05',
+      sku: 'MBA-M3-13-256',
+      name: 'MacBook Air M3 13" 256GB',
+      barcode: '8691234567891',
+      brand: 'Apple',
+      categoryId: 'c-02',
+      unit: 'adet',
+      minStock: 5,
+      description: '8GB birleşik bellek',
+    ),
+    Product(
+      id: 'p-06',
+      sku: 'MBP-M3-14-512',
+      name: 'MacBook Pro M3 14" 512GB',
+      barcode: '8691234567897',
+      brand: 'Apple',
+      categoryId: 'c-02',
+      unit: 'adet',
+      minStock: 3,
+      description: '18GB birleşik bellek, Liquid Retina XDR',
+    ),
+    Product(
+      id: 'p-07',
+      sku: 'DELL-XPS13-16',
+      name: 'Dell XPS 13 16GB',
+      barcode: '8691234567898',
+      brand: 'Dell',
+      categoryId: 'c-02',
+      unit: 'adet',
+      minStock: 4,
+      description: 'Intel Core Ultra 7, 512GB SSD',
+    ),
+    Product(
+      id: 'p-08',
+      sku: 'LEN-TP-E14',
+      name: 'Lenovo ThinkPad E14',
+      barcode: '8691234567899',
+      brand: 'Lenovo',
+      categoryId: 'c-02',
+      unit: 'adet',
+      minStock: 4,
+      description: 'AMD Ryzen 7, 16GB RAM',
+    ),
+
+    // --- Aksesuar ---
+    Product(
+      id: 'p-09',
+      sku: 'USBC-CBL-2M',
+      name: 'USB-C Kablo 2m',
+      barcode: '8691234567892',
+      brand: 'Anker',
+      categoryId: 'c-03',
+      unit: 'adet',
+      minStock: 30,
+      description: '100W hızlı şarj destekli',
+    ),
+    Product(
+      id: 'p-10',
+      sku: 'LOGI-MX3S',
+      name: 'Logitech MX Master 3S',
+      barcode: '8691234567893',
+      brand: 'Logitech',
+      categoryId: 'c-03',
+      unit: 'adet',
+      minStock: 10,
+      description: 'Sessiz tıklama, 8000 DPI',
+    ),
+    Product(
+      id: 'p-11',
+      sku: 'LOGI-K380',
+      name: 'Logitech K380 Klavye',
+      barcode: '8691234567800',
+      brand: 'Logitech',
+      categoryId: 'c-03',
+      unit: 'adet',
+      minStock: 10,
+      description: 'Bluetooth, çoklu cihaz',
+    ),
+    Product(
+      id: 'p-12',
+      sku: 'ANKER-PB-20K',
+      name: 'Anker PowerBank 20000mAh',
+      barcode: '8691234567801',
+      brand: 'Anker',
+      categoryId: 'c-03',
+      unit: 'adet',
+      minStock: 15,
+      description: '65W çift yönlü hızlı şarj',
+    ),
+
+    // --- Ses & Görüntü ---
+    Product(
+      id: 'p-13',
+      sku: 'APP-AIRP-P2',
+      name: 'AirPods Pro 2',
+      barcode: '8691234567802',
+      brand: 'Apple',
+      categoryId: 'c-04',
+      unit: 'adet',
+      minStock: 12,
+      description: 'USB-C, aktif gürültü engelleme',
+    ),
+    Product(
+      id: 'p-14',
+      sku: 'SONY-XM5',
+      name: 'Sony WH-1000XM5',
+      barcode: '8691234567803',
+      brand: 'Sony',
+      categoryId: 'c-04',
+      unit: 'adet',
+      minStock: 6,
+      description: 'Kulak üstü, 30 saat pil',
+    ),
+    Product(
+      id: 'p-15',
+      sku: 'JBL-FLIP6',
+      name: 'JBL Flip 6 Hoparlör',
+      barcode: '8691234567804',
+      brand: 'JBL',
+      categoryId: 'c-04',
+      unit: 'adet',
+      minStock: 8,
+      description: 'IP67 suya dayanıklı, 12 saat pil',
+    ),
+  ];
+}
