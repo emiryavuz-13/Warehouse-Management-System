@@ -1,11 +1,11 @@
 {
-    "name": "warehouse_management_system",
-    "short_name": "warehouse_management_system",
+    "name": "Depo Yönetimi",
+    "short_name": "Depo Yönetimi",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Depo Yönetimi Mobil Uygulaması (WMS)",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
