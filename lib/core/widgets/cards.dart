@@ -11,13 +11,22 @@ import 'app_card.dart';
 import 'info_widgets.dart';
 import 'status_badge.dart';
 
-/// Ürün kartı (şartname 8. bölüm).
+/// Ürün satırı (şartname 8. bölüm).
 ///
-/// Gösterdikleri: görsel yerine ikon kutusu, ürün adı, SKU, stok miktarı,
-/// ana lokasyon ve durum rozeti — şartnamedeki listenin birebir karşılığı.
+/// Gösterdikleri: kategori ikonu, ürün adı, SKU, ana lokasyon, stok miktarı
+/// ve —yalnızca gerektiğinde— durum rozeti.
+///
+/// **Kart değil satır.** Uzun bir listede her ürüne çerçeve çizmek, otuz
+/// üründe yüz yirmi kenar çizgisi demektir; ayraç aynı ayrımı tek çizgiyle
+/// yapar ve göz ürün adlarını daha hızlı tarar.
+///
+/// **Rozet yalnızca sorunlu durumda.** Her satıra "Normal" rozeti basmak
+/// listeyi yeşile boğar ve asıl dikkat edilmesi gerekenleri görünmez kılar.
+/// Normal stokta rozet yok; miktar da nötr renkte. Kritik ve tükenmiş
+/// ürünlerde hem miktar renklenir hem rozet çıkar.
 ///
 /// Mock veride ürün görseli yok; kategori ikonu kullanılır. Gri bir kutu
-/// koymaktansa kategoriyi göstermek, listede göz taramasını kolaylaştırır.
+/// koymaktansa kategoriyi göstermek listede göz taramasını kolaylaştırır.
 class ProductCard extends StatelessWidget {
   const ProductCard({
     required this.summary,
@@ -30,7 +39,7 @@ class ProductCard extends StatelessWidget {
   final ProductStockSummary summary;
   final VoidCallback? onTap;
 
-  /// Sağ tarafa özel içerik — seçim onay kutusu, ok ikonu vb.
+  /// Sağ tarafa özel içerik — seçim onay kutusu vb.
   final Widget? trailing;
 
   final bool showLocation;
@@ -40,83 +49,132 @@ class ProductCard extends StatelessWidget {
     final AppStatusColors status = Theme.of(context).status;
     final StockStatus stockStatus = summary.status;
     final Product product = summary.product;
+    final bool needsAttention = stockStatus != StockStatus.normal;
 
-    return AppCard(
+    final List<String> meta = <String>[
+      product.sku,
+      if (showLocation && summary.primaryLocation != null)
+        summary.primaryLocation!.code,
+      if (showLocation && summary.isMultiLocation)
+        '+${summary.locations.length - 1} lokasyon',
+    ];
+
+    return InkWell(
       onTap: onTap,
-      // Sorunlu stoklarda sol şerit: listede göz hemen oraya gider.
-      accentColor: stockStatus == StockStatus.normal
-          ? null
-          : stockStatus.tone.foreground(context),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          AppIconBox(
-            icon: categoryIcon(summary.category?.iconKey ?? ''),
-            background: status.neutralContainer,
-            foreground: status.neutral,
-          ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+        child: Row(
+          children: <Widget>[
+            AppIconBox(
+              icon: categoryIcon(summary.category?.iconKey ?? ''),
+              size: 40,
+              iconSize: 19,
+              background: needsAttention
+                  ? stockStatus.tone.background(context)
+                  : status.neutralContainer,
+              foreground: needsAttention
+                  ? stockStatus.tone.foreground(context)
+                  : status.neutral,
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    product.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodyMedium
+                        ?.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    meta.join(' · '),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.code.copyWith(
+                      fontSize: 11.5,
+                      color: status.neutral,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                Text(
-                  product.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-                const SizedBox(height: AppSpacing.xs + 2),
-                Wrap(
-                  spacing: AppSpacing.sm,
-                  runSpacing: AppSpacing.xs,
-                  crossAxisAlignment: WrapCrossAlignment.center,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    CodeChip(code: product.sku, compact: true),
-                    if (showLocation && summary.primaryLocation != null)
-                      CodeChip(
-                        code: summary.primaryLocation!.code,
-                        icon: AppIcons.locations,
-                        compact: true,
+                    Text(
+                      Formatters.integer.format(summary.totalQuantity),
+                      style: AppTypography.metricMedium.copyWith(
+                        color: needsAttention
+                            ? stockStatus.tone.foreground(context)
+                            : null,
                       ),
-                    if (showLocation && summary.isMultiLocation)
-                      Text(
-                        '+${summary.locations.length - 1} lokasyon',
-                        style: Theme.of(context).textTheme.bodySmall
-                            ?.copyWith(color: status.neutral),
-                      ),
+                    ),
+                    const SizedBox(width: 3),
+                    Text(
+                      product.unit,
+                      style: Theme.of(context).textTheme.bodySmall
+                          ?.copyWith(color: status.neutral),
+                    ),
                   ],
                 ),
+                if (needsAttention) ...<Widget>[
+                  const SizedBox(height: 3),
+                  StockStatusBadge(status: stockStatus, compact: true),
+                ],
               ],
             ),
-          ),
-          const SizedBox(width: AppSpacing.md),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: <Widget>[
-              Text(
-                Formatters.integer.format(summary.totalQuantity),
-                style: AppTypography.metricMedium.copyWith(
-                  color: stockStatus == StockStatus.normal
-                      ? null
-                      : stockStatus.tone.foreground(context),
-                ),
-              ),
-              Text(
-                product.unit,
-                style: Theme.of(context).textTheme.bodySmall
-                    ?.copyWith(color: status.neutral),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              StockStatusBadge(status: stockStatus, compact: true),
+            if (trailing != null) ...<Widget>[
+              const SizedBox(width: AppSpacing.sm),
+              trailing!,
             ],
-          ),
-          if (trailing != null) ...<Widget>[
-            const SizedBox(width: AppSpacing.sm),
-            trailing!,
           ],
-        ],
+        ),
       ),
+    );
+  }
+}
+
+/// Ürün satırlarını ayraçlarla dizer.
+///
+/// Listenin kendisi kaydırılabilir değildir; `SliverList` veya `Column`
+/// içine konur. Ayraç yalnızca satır aralarına girer, listenin başına ve
+/// sonuna değil.
+class ProductList extends StatelessWidget {
+  const ProductList({
+    required this.products,
+    required this.onProductTap,
+    this.trailingBuilder,
+    super.key,
+  });
+
+  final List<ProductStockSummary> products;
+  final void Function(ProductStockSummary summary) onProductTap;
+  final Widget? Function(ProductStockSummary summary)? trailingBuilder;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppStatusColors status = Theme.of(context).status;
+
+    return Column(
+      children: <Widget>[
+        for (int i = 0; i < products.length; i++) ...<Widget>[
+          if (i > 0) Divider(height: 1, color: status.border),
+          ProductCard(
+            summary: products[i],
+            trailing: trailingBuilder?.call(products[i]),
+            onTap: () => onProductTap(products[i]),
+          ),
+        ],
+      ],
     );
   }
 }

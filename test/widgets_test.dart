@@ -131,8 +131,9 @@ void main() {
 
       expect(tester.takeException(), isNull);
       expect(find.textContaining('iPhone 15'), findsOneWidget);
-      expect(find.text('IP15-128-BLK'), findsOneWidget);
-      expect(find.text('A-01-01'), findsOneWidget);
+      // SKU ve lokasyon tek meta satırında birleşir.
+      expect(find.textContaining('IP15-128-BLK'), findsOneWidget);
+      expect(find.textContaining('A-01-01'), findsOneWidget);
       // Binlik ayraç Türkçe biçimde.
       expect(find.text('1.248'), findsOneWidget);
     });
@@ -143,6 +144,15 @@ void main() {
       await pumpDark(tester, ProductCard(summary: summaryWith(5)));
 
       expect(find.text('Kritik'), findsOneWidget);
+    });
+
+    testWidgets('normal stokta rozet gösterilmez', (WidgetTester tester) async {
+      // Her satıra "Normal" rozeti basmak listeyi yeşile boğar ve asıl
+      // dikkat edilmesi gerekenleri görünmez kılar.
+      await pumpDark(tester, ProductCard(summary: summaryWith(240)));
+
+      expect(find.text('Normal'), findsNothing);
+      expect(find.text('Kritik'), findsNothing);
     });
 
     testWidgets('dokunma geri çağrısı çalışır', (WidgetTester tester) async {

@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../core/widgets/module_placeholder.dart';
 import '../features/dashboard/presentation/dashboard_page.dart';
+import '../features/products/presentation/product_detail_page.dart';
+import '../features/products/presentation/product_list_page.dart';
 import '../features/shell/presentation/app_shell.dart';
 import '../features/splash/presentation/splash_page.dart';
 import 'routes.dart';
@@ -148,15 +150,14 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         path: AppRoutes.products,
         name: AppRouteNames.products,
         builder: (BuildContext context, GoRouterState state) =>
-            const ModulePlaceholder(title: 'Ürünler', icon: AppIcons.products),
+            const ProductListPage(),
         routes: <RouteBase>[
           GoRoute(
             path: ':productId',
             name: AppRouteNames.productDetail,
             builder: (BuildContext context, GoRouterState state) =>
-                const ModulePlaceholder(
-                  title: 'Ürün Detayı',
-                  icon: AppIcons.stock,
+                ProductDetailPage(
+                  productId: state.pathParameters['productId']!,
                 ),
           ),
         ],

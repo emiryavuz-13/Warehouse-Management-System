@@ -276,3 +276,61 @@ class _Chip extends StatelessWidget {
     );
   }
 }
+
+/// Etkin filtreyi gösteren, tek dokunuşla kaldırılabilen çip.
+///
+/// Liste ekranlarında filtre panelinin dışında, başlığın hemen altında
+/// durur. Kullanıcı hangi daraltmaların açık olduğunu paneli açmadan
+/// görebilmeli; aksi halde "neden bu kadar az kayıt var" sorusunun cevabı
+/// gizli kalır.
+class RemovableChip extends StatelessWidget {
+  const RemovableChip({
+    required this.label,
+    required this.onRemove,
+    this.tone,
+    super.key,
+  });
+
+  final String label;
+  final VoidCallback onRemove;
+
+  /// Durum filtrelerinde çip ilgili renge boyanır.
+  final StatusTone? tone;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppStatusColors status = Theme.of(context).status;
+    final Color foreground = tone?.foreground(context) ?? status.neutral;
+    final Color background =
+        tone?.background(context) ?? status.neutralContainer;
+
+    return Material(
+      color: background,
+      borderRadius: BorderRadius.circular(AppRadius.pill),
+      child: InkWell(
+        onTap: onRemove,
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.md,
+            AppSpacing.sm - 2,
+            AppSpacing.sm,
+            AppSpacing.sm - 2,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text(
+                label,
+                style: Theme.of(context).textTheme.bodySmall
+                    ?.copyWith(color: foreground, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(width: AppSpacing.xs),
+              Icon(AppIcons.close, size: 14, color: foreground),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
