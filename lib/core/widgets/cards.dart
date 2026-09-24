@@ -183,6 +183,17 @@ class ProductList extends StatelessWidget {
 ///
 /// Toplanmakta olan siparişlerde ilerleme çubuğu gösterilir; kullanıcı
 /// listeye bakarak hangi işin ne kadar ilerlediğini görebilmeli.
+/// Sipariş satırı (şartname 13. bölüm).
+///
+/// Şartnamenin istediği altı alan: sipariş numarası, müşteri, ürün sayısı,
+/// toplam adet, durum ve tarih.
+///
+/// Ürün ve stok listeleriyle aynı dil: kart değil ayraçla ayrılmış satır.
+/// Acil siparişler kenarlıkla değil öncelik rozetiyle işaretlenir — kutusuz
+/// bir listede renkli şerit tutunacak bir kenar bulamaz.
+///
+/// İlerleme çubuğu yalnızca toplanmakta olan siparişte çizilir: yeni bir
+/// siparişte %0, sevk edilmişte %100 gösterir ve ikisi de bilgi taşımaz.
 class OrderCard extends StatelessWidget {
   const OrderCard({required this.order, this.onTap, super.key});
 
@@ -194,87 +205,88 @@ class OrderCard extends StatelessWidget {
     final AppStatusColors status = Theme.of(context).status;
     final bool inProgress = order.status == OrderStatus.picking;
 
-    return AppCard(
+    return InkWell(
       onTap: onTap,
-      accentColor: order.priority == OrderPriority.urgent
-          ? status.danger
-          : null,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          // Sol grup esnek: uzun sipariş numarası veya geniş öncelik rozeti
-          // durum rozetini ekran dışına itmemeli.
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Flexible(
-                      child: Text(
-                        '#${order.orderNumber}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.titleSmall,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            // Sol grup esnek: uzun sipariş numarası veya geniş öncelik
+            // rozeti durum rozetini ekran dışına itmemeli.
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Flexible(
+                        child: Text(
+                          '#${order.orderNumber}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
                       ),
-                    ),
-                    if (order.priority == OrderPriority.urgent ||
-                        order.priority == OrderPriority.high) ...<Widget>[
-                      const SizedBox(width: AppSpacing.sm),
-                      OrderPriorityBadge(priority: order.priority),
+                      if (order.priority == OrderPriority.urgent ||
+                          order.priority == OrderPriority.high) ...<Widget>[
+                        const SizedBox(width: AppSpacing.sm),
+                        OrderPriorityBadge(priority: order.priority),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              OrderStatusBadge(status: order.status, compact: true),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.sm - 2),
-          Text(
-            order.customerName,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Row(
-            children: <Widget>[
-              Flexible(
-                child: _MetaItem(
-                  icon: AppIcons.products,
-                  text: '${order.lineCount} çeşit',
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Flexible(
-                child: _MetaItem(
-                  icon: AppIcons.stock,
-                  text: Formatters.quantity(order.totalQuantity, 'adet'),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Text(
-                  Formatters.relative(order.createdAt),
-                  textAlign: TextAlign.right,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodySmall
-                      ?.copyWith(color: status.neutral),
-                ),
-              ),
-            ],
-          ),
-          if (inProgress) ...<Widget>[
-            const SizedBox(height: AppSpacing.md),
-            TaskProgressBar(
-              completed: order.pickedQuantity,
-              total: order.totalQuantity,
-              label: 'Toplama',
+                const SizedBox(width: AppSpacing.sm),
+                OrderStatusBadge(status: order.status, compact: true),
+              ],
             ),
+            const SizedBox(height: AppSpacing.sm - 2),
+            Text(
+              order.customerName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodyMedium
+                  ?.copyWith(fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Row(
+              children: <Widget>[
+                Flexible(
+                  child: _MetaItem(
+                    icon: AppIcons.products,
+                    text: '${order.lineCount} çeşit',
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Flexible(
+                  child: _MetaItem(
+                    icon: AppIcons.stock,
+                    text: Formatters.quantity(order.totalQuantity, 'adet'),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    Formatters.relative(order.createdAt),
+                    textAlign: TextAlign.right,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodySmall
+                        ?.copyWith(color: status.neutral),
+                  ),
+                ),
+              ],
+            ),
+            if (inProgress) ...<Widget>[
+              const SizedBox(height: AppSpacing.md),
+              TaskProgressBar(
+                completed: order.pickedQuantity,
+                total: order.totalQuantity,
+                label: 'Toplama',
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

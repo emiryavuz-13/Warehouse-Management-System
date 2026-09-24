@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:warehouse_management_system/app/app.dart';
+import 'package:warehouse_management_system/core/widgets/widgets.dart';
 import 'package:warehouse_management_system/data/mock_config.dart';
 import 'package:warehouse_management_system/app/providers/providers.dart';
 
@@ -82,13 +83,7 @@ void main() {
     await tester.tap(find.text('Siparişler'));
     await tester.pumpAndSettle();
 
-    expect(
-      find.text(
-        'Sipariş listesi, detayı ve toplama akışı sıradaki adımlarda '
-        'eklenecek.',
-      ),
-      findsOneWidget,
-    );
+    expect(find.byType(OrderCard), findsWidgets);
 
     await tester.tap(find.text('Profil'));
     await tester.pumpAndSettle();

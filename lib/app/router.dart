@@ -10,6 +10,9 @@ import '../features/products/presentation/product_detail_page.dart';
 import '../features/products/presentation/product_list_page.dart';
 import '../features/locations/presentation/location_detail_page.dart';
 import '../features/locations/presentation/locations_page.dart';
+import '../features/orders/presentation/order_detail_page.dart';
+import '../features/orders/presentation/orders_page.dart';
+import '../features/orders/presentation/picking_page.dart';
 import '../features/receiving/presentation/putaway_page.dart';
 import '../features/receiving/presentation/receipt_detail_page.dart';
 import '../features/receiving/presentation/receiving_list_page.dart';
@@ -105,14 +108,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                 path: AppRoutes.orders,
                 name: AppRouteNames.orders,
                 builder: (BuildContext context, GoRouterState state) =>
-                    const ModulePlaceholder(
-                      title: 'Siparişler',
-                      icon: AppIcons.orders,
-                      description:
-                          'Sipariş listesi, detayı ve toplama akışı '
-                          'sıradaki adımlarda eklenecek.',
-                      showAppBar: false,
-                    ),
+                    const OrdersPage(),
               ),
             ],
           ),
@@ -203,19 +199,13 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         path: '${AppRoutes.orders}/:orderId',
         name: AppRouteNames.orderDetail,
         builder: (BuildContext context, GoRouterState state) =>
-            const ModulePlaceholder(
-              title: 'Sipariş Detayı',
-              icon: AppIcons.orders,
-            ),
+            OrderDetailPage(orderId: state.pathParameters['orderId']!),
         routes: <RouteBase>[
           GoRoute(
             path: 'picking',
             name: AppRouteNames.picking,
             builder: (BuildContext context, GoRouterState state) =>
-                const ModulePlaceholder(
-                  title: 'Toplama Görevi',
-                  icon: AppIcons.picking,
-                ),
+                PickingPage(orderId: state.pathParameters['orderId']!),
           ),
         ],
       ),
