@@ -43,11 +43,22 @@ final FutureProvider<List<ProductCategory>> categoriesProvider =
       return ref.watch(productRepositoryProvider).getCategories();
     });
 
-/// Tüm lokasyonlar, doluluk bilgisiyle (şartname 18. bölüm).
+/// Kullanıcının çalıştığı depodaki lokasyonlar, doluluk bilgisiyle
+/// (şartname 18. bölüm).
+///
+/// **Yalnızca tek depo.** Mal kabul, transfer ve filtre ekranları bu listeyi
+/// kullanıyor; tüm depoları döndürseydi kullanıcı Merkez Depo'daki bir rafı
+/// Anadolu Depo'daki bir rafa "transfer" edebilirdi. Depolar arası sevkiyat
+/// bir raf hareketi değil, ayrı bir iştir.
+///
+/// Lokasyon ekranı başka bir depoya bakmak istediğinde bu sağlayıcıyı değil
+/// kendi sorgusunu kullanır.
 final FutureProvider<List<LocationSummary>> locationsProvider =
     FutureProvider<List<LocationSummary>>((Ref ref) {
       ref.watch(dataRevisionProvider);
-      return ref.watch(warehouseRepositoryProvider).getLocations();
+      return ref
+          .watch(warehouseRepositoryProvider)
+          .getLocations(warehouseId: ref.watch(currentWarehouseIdProvider));
     });
 
 /// Okunmamış bildirim sayısı — bottom bar ve dashboard rozetleri.

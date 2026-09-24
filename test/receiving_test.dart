@@ -350,6 +350,22 @@ void main() {
       expect(detail.lines.first.line.remainingQuantity, 30);
     });
 
+    test('yerleştirme adayları yalnızca kullanıcının deposundan', () async {
+      final ProviderContainer container = makeContainer();
+
+      final List<PutawayLocation> options = await container.read(
+        putawayLocationsProvider('p-01').future,
+      );
+
+      expect(options, isNotEmpty);
+      expect(
+        options.every(
+          (PutawayLocation l) => l.summary.location.warehouseId == 'w-01',
+        ),
+        isTrue,
+      );
+    });
+
     test('kapasitesi yetmeyen rafa yerleştirilemez', () async {
       final ProviderContainer container = makeContainer();
 

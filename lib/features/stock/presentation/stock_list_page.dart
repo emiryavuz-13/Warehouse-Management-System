@@ -47,6 +47,13 @@ class StockListPage extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Stok'),
         actions: <Widget>[
+          // Lokasyonlar stok ekranının kardeşi: biri "ne kadar var",
+          // diğeri "nerede duruyor" sorusunu yanıtlar.
+          IconButton(
+            icon: const Icon(AppIcons.locations),
+            tooltip: 'Lokasyonlar',
+            onPressed: () => context.push(AppRoutes.locations),
+          ),
           IconButton(
             icon: const Icon(AppIcons.count),
             tooltip: 'Stok sayımı',

@@ -386,6 +386,38 @@ void main() {
     });
   });
 
+  group('Depo sınırı', () {
+    test('hedef listesi yalnızca kullanıcının deposunu içerir', () async {
+      // Merkez Depo'daki bir rafı Anadolu Depo'daki bir rafa "transfer"
+      // etmek bir raf hareketi değil, ayrı bir iştir.
+      final ProviderContainer container = makeContainer();
+
+      final List<TransferTarget> targets = await container.read(
+        targetLocationsProvider(
+          const TransferTargetQuery(
+            productId: 'p-01',
+            sourceLocationId: 'loc-a0101',
+          ),
+        ).future,
+      );
+
+      expect(targets, isNotEmpty);
+      expect(
+        targets.every(
+          (TransferTarget t) => t.summary.location.warehouseId == 'w-01',
+        ),
+        isTrue,
+        reason: 'Başka deponun rafı hedef olarak sunulmamalı',
+      );
+      expect(
+        targets.any(
+          (TransferTarget t) => t.summary.location.code.startsWith('D-'),
+        ),
+        isFalse,
+      );
+    });
+  });
+
   group('İş kuralları (şartname 26. bölüm)', () {
     test('transfer toplamı değiştirmez, hareket oluşturur', () async {
       final ProviderContainer container = makeContainer();
