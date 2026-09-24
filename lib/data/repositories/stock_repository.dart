@@ -90,28 +90,26 @@ class MockStockRepository implements StockRepository {
 
     final String query = filter.query.trim().toLowerCase();
 
-    final List<ProductStockSummary> result = _db.products
-        .map(_summarize)
-        .where((ProductStockSummary s) {
-          if (query.isNotEmpty && !s.product.searchText.contains(query)) {
-            return false;
-          }
-          if (filter.status != null && s.status != filter.status) return false;
-          if (filter.locationId != null) {
-            final bool atLocation = s.locations.any(
-              (LocationStock l) => l.location.id == filter.locationId,
-            );
-            if (!atLocation) return false;
-          }
-          return true;
-        })
-        .toList();
+    final List<ProductStockSummary> result = _db.products.map(_summarize).where(
+      (ProductStockSummary s) {
+        if (query.isNotEmpty && !s.product.searchText.contains(query)) {
+          return false;
+        }
+        if (filter.status != null && s.status != filter.status) return false;
+        if (filter.locationId != null) {
+          final bool atLocation = s.locations.any(
+            (LocationStock l) => l.location.id == filter.locationId,
+          );
+          if (!atLocation) return false;
+        }
+        return true;
+      },
+    ).toList();
 
     // Operasyonel öncelik: önce sorunlu stoklar, sonra ada göre.
     result.sort((ProductStockSummary a, ProductStockSummary b) {
-      final int byStatus = _statusRank(
-        a.status,
-      ).compareTo(_statusRank(b.status));
+      final int byStatus = _statusRank(a.status)
+          .compareTo(_statusRank(b.status));
       if (byStatus != 0) return byStatus;
       return a.product.name.toLowerCase().compareTo(
         b.product.name.toLowerCase(),

@@ -6,6 +6,7 @@ import '../../../app/providers/providers.dart';
 import '../../../app/routes.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_spacing.dart';
+import '../../../app/theme/status_tone_colors.dart';
 import '../../../core/constants/app_constants.dart';
 
 /// Açılış ekranı (şartname 28. bölüm, 1. ekran).
@@ -74,7 +75,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                 borderRadius: BorderRadius.circular(AppRadius.xl),
               ),
               child: Icon(
-                Icons.warehouse_rounded,
+                AppIcons.locations,
                 size: 44,
                 color: colors.onPrimary,
               ),
@@ -87,9 +88,8 @@ class _SplashPageState extends ConsumerState<SplashPage> {
             const SizedBox(height: AppSpacing.xs),
             Text(
               'Depo Yönetim Sistemi',
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: status.neutral),
+              style: Theme.of(context).textTheme.bodyMedium
+                  ?.copyWith(color: status.neutral),
             ),
             const SizedBox(height: AppSpacing.xxl),
             SizedBox(

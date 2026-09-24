@@ -61,6 +61,16 @@ dependencies:
   # yazmak yerine props listesi yeterli olur
   equatable: ^2.1.0
 
+  # Yukleniyor durumunda iskelet gosterimi (sartname 25. bolum).
+  # Mevcut widget agacini otomatik iskelete cevirir; her ekran icin ayri
+  # iskelet tasarlamaya gerek kalmaz.
+  skeletonizer: ^3.0.0
+
+  # Tek ikon ailesi (sartname 5. bolum: tutarli ikonografi).
+  # Ince cizgi stili kurumsal/premium hissi verir; forklift, pallet gibi
+  # lojistik ikonlari da bu sette mevcut, ikinci bir pakete gerek yok.
+  lucide_icons_flutter: ^3.1.20
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

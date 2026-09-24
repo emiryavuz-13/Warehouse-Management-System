@@ -77,11 +77,7 @@ abstract final class MockOrders {
       createdAt: now.subtract(const Duration(hours: 4)),
       dueDate: now.add(const Duration(days: 1)),
       items: const <OrderItem>[
-        OrderItem(
-          productId: 'p-12',
-          requestedQuantity: 10,
-          pickedQuantity: 10,
-        ),
+        OrderItem(productId: 'p-12', requestedQuantity: 10, pickedQuantity: 10),
         OrderItem(productId: 'p-11', requestedQuantity: 4),
       ],
     ),

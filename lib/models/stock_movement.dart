@@ -67,10 +67,7 @@ class StockMovement extends Equatable {
   ///
   /// Tek taraflı hareketlerde yalnızca ilgili lokasyon döner, hiçbiri yoksa
   /// `null` döner ve UI o satırı çizmez.
-  String? routeLabel({
-    String? sourceCode,
-    String? targetCode,
-  }) {
+  String? routeLabel({String? sourceCode, String? targetCode}) {
     if (sourceCode != null && targetCode != null) {
       return '$sourceCode → $targetCode';
     }

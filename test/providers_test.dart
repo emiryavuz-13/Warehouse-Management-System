@@ -55,12 +55,14 @@ void main() {
       expect(a0101Before, 18);
 
       // Provider'ı elle invalidate etmiyoruz; yalnızca işlemi yapıyoruz.
-      await container.read(warehouseActionsProvider).transferStock(
-        productId: 'p-01',
-        sourceLocationId: 'loc-a0101',
-        targetLocationId: 'loc-b0302',
-        quantity: 5,
-      );
+      await container
+          .read(warehouseActionsProvider)
+          .transferStock(
+            productId: 'p-01',
+            sourceLocationId: 'loc-a0101',
+            targetLocationId: 'loc-b0302',
+            quantity: 5,
+          );
 
       final ProductStockSummary after = (await container.read(
         productSummaryProvider('p-01').future,
@@ -82,12 +84,14 @@ void main() {
         await container.read(locationsProvider.future),
       ).usedQuantity;
 
-      await container.read(warehouseActionsProvider).transferStock(
-        productId: 'p-01',
-        sourceLocationId: 'loc-a0101',
-        targetLocationId: 'loc-b0302',
-        quantity: 5,
-      );
+      await container
+          .read(warehouseActionsProvider)
+          .transferStock(
+            productId: 'p-01',
+            sourceLocationId: 'loc-a0101',
+            targetLocationId: 'loc-b0302',
+            quantity: 5,
+          );
 
       final int usedAfter = findA0101(
         await container.read(locationsProvider.future),
@@ -105,21 +109,9 @@ void main() {
 
       // Üç satırı da toplayınca "Toplama tamamlandı" bildirimi oluşur.
       final WarehouseActions actions = container.read(warehouseActionsProvider);
-      await actions.pickLine(
-        taskId: 'pk-102',
-        productId: 'p-01',
-        quantity: 2,
-      );
-      await actions.pickLine(
-        taskId: 'pk-102',
-        productId: 'p-09',
-        quantity: 5,
-      );
-      await actions.pickLine(
-        taskId: 'pk-102',
-        productId: 'p-10',
-        quantity: 1,
-      );
+      await actions.pickLine(taskId: 'pk-102', productId: 'p-01', quantity: 2);
+      await actions.pickLine(taskId: 'pk-102', productId: 'p-09', quantity: 5);
+      await actions.pickLine(taskId: 'pk-102', productId: 'p-10', quantity: 1);
 
       final int after = await container.read(
         unreadNotificationCountProvider.future,
@@ -173,12 +165,14 @@ void main() {
       final ProviderContainer container = makeContainer();
 
       await expectLater(
-        container.read(warehouseActionsProvider).transferStock(
-          productId: 'p-01',
-          sourceLocationId: 'loc-a0101',
-          targetLocationId: 'loc-a0101',
-          quantity: 1,
-        ),
+        container
+            .read(warehouseActionsProvider)
+            .transferStock(
+              productId: 'p-01',
+              sourceLocationId: 'loc-a0101',
+              targetLocationId: 'loc-a0101',
+              quantity: 1,
+            ),
         throwsA(
           isA<WarehouseException>().having(
             (WarehouseException e) => e.code,
@@ -194,12 +188,14 @@ void main() {
       final int before = container.read(dataRevisionProvider);
 
       try {
-        await container.read(warehouseActionsProvider).transferStock(
-          productId: 'p-01',
-          sourceLocationId: 'loc-a0101',
-          targetLocationId: 'loc-b0302',
-          quantity: 9999,
-        );
+        await container
+            .read(warehouseActionsProvider)
+            .transferStock(
+              productId: 'p-01',
+              sourceLocationId: 'loc-a0101',
+              targetLocationId: 'loc-b0302',
+              quantity: 9999,
+            );
       } on WarehouseException {
         // beklenen
       }
@@ -311,12 +307,14 @@ void main() {
       // görünmezdi.
       final ProviderContainer container = makeContainer();
 
-      await container.read(warehouseActionsProvider).transferStock(
-        productId: 'p-01',
-        sourceLocationId: 'loc-a0101',
-        targetLocationId: 'loc-b0302',
-        quantity: 5,
-      );
+      await container
+          .read(warehouseActionsProvider)
+          .transferStock(
+            productId: 'p-01',
+            sourceLocationId: 'loc-a0101',
+            targetLocationId: 'loc-b0302',
+            quantity: 5,
+          );
 
       final ProductStockSummary viaProduct = (await container
           .read(productRepositoryProvider)

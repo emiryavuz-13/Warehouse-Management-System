@@ -6,6 +6,7 @@ import '../core/widgets/module_placeholder.dart';
 import '../features/shell/presentation/app_shell.dart';
 import '../features/splash/presentation/splash_page.dart';
 import 'routes.dart';
+import 'theme/status_tone_colors.dart';
 
 /// Uygulamanın rota ağacı.
 ///
@@ -41,12 +42,11 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
       // Bottom navigation sekmeleri (şartname 6. bölüm)
       // ---------------------------------------------------------------------
       StatefulShellRoute.indexedStack(
-        builder:
-            (
-              BuildContext context,
-              GoRouterState state,
-              StatefulNavigationShell navigationShell,
-            ) => AppShell(navigationShell: navigationShell),
+        builder: (
+          BuildContext context,
+          GoRouterState state,
+          StatefulNavigationShell navigationShell,
+        ) => AppShell(navigationShell: navigationShell),
         branches: <StatefulShellBranch>[
           // 0 — Ana Sayfa
           StatefulShellBranch(
@@ -57,7 +57,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                 builder: (BuildContext context, GoRouterState state) =>
                     const ModulePlaceholder(
                       title: 'Ana Sayfa',
-                      icon: Icons.dashboard_rounded,
+                      icon: AppIcons.dashboard,
                       description:
                           'Dashboard, özet kartları ve hızlı işlemler '
                           'sıradaki adımda eklenecek.',
@@ -76,7 +76,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                 builder: (BuildContext context, GoRouterState state) =>
                     const ModulePlaceholder(
                       title: 'Stok',
-                      icon: Icons.inventory_2_rounded,
+                      icon: AppIcons.stock,
                       description:
                           'Operasyonel stok listesi ve stok detayı '
                           'sıradaki adımlarda eklenecek.',
@@ -95,7 +95,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                 builder: (BuildContext context, GoRouterState state) =>
                     const ModulePlaceholder(
                       title: 'Barkod Tara',
-                      icon: Icons.qr_code_scanner_rounded,
+                      icon: AppIcons.scan,
                       description:
                           'Kamera ile tarama ve demo barkod listesi '
                           'sıradaki adımlarda eklenecek.',
@@ -114,7 +114,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                 builder: (BuildContext context, GoRouterState state) =>
                     const ModulePlaceholder(
                       title: 'Siparişler',
-                      icon: Icons.receipt_long_rounded,
+                      icon: AppIcons.orders,
                       description:
                           'Sipariş listesi, detayı ve toplama akışı '
                           'sıradaki adımlarda eklenecek.',
@@ -133,7 +133,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                 builder: (BuildContext context, GoRouterState state) =>
                     const ModulePlaceholder(
                       title: 'Profil',
-                      icon: Icons.person_rounded,
+                      icon: AppIcons.profile,
                       description:
                           'Kullanıcı bilgileri, yetkiler ve tema ayarı '
                           'sıradaki adımlarda eklenecek.',
@@ -154,10 +154,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         path: AppRoutes.products,
         name: AppRouteNames.products,
         builder: (BuildContext context, GoRouterState state) =>
-            const ModulePlaceholder(
-              title: 'Ürünler',
-              icon: Icons.category_rounded,
-            ),
+            const ModulePlaceholder(title: 'Ürünler', icon: AppIcons.products),
         routes: <RouteBase>[
           GoRoute(
             path: ':productId',
@@ -165,7 +162,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
             builder: (BuildContext context, GoRouterState state) =>
                 const ModulePlaceholder(
                   title: 'Ürün Detayı',
-                  icon: Icons.inventory_rounded,
+                  icon: AppIcons.stock,
                 ),
           ),
         ],
@@ -178,7 +175,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         builder: (BuildContext context, GoRouterState state) =>
             const ModulePlaceholder(
               title: 'Mal Kabul',
-              icon: Icons.move_to_inbox_rounded,
+              icon: AppIcons.receiving,
             ),
         routes: <RouteBase>[
           GoRoute(
@@ -187,7 +184,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
             builder: (BuildContext context, GoRouterState state) =>
                 const ModulePlaceholder(
                   title: 'Mal Kabul Detayı',
-                  icon: Icons.move_to_inbox_rounded,
+                  icon: AppIcons.receiving,
                 ),
             routes: <RouteBase>[
               GoRoute(
@@ -196,7 +193,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                 builder: (BuildContext context, GoRouterState state) =>
                     const ModulePlaceholder(
                       title: 'Ürün Yerleştirme',
-                      icon: Icons.shelves,
+                      icon: AppIcons.locations,
                     ),
               ),
             ],
@@ -211,7 +208,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         builder: (BuildContext context, GoRouterState state) =>
             const ModulePlaceholder(
               title: 'Sipariş Detayı',
-              icon: Icons.receipt_long_rounded,
+              icon: AppIcons.orders,
             ),
         routes: <RouteBase>[
           GoRoute(
@@ -220,7 +217,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
             builder: (BuildContext context, GoRouterState state) =>
                 const ModulePlaceholder(
                   title: 'Toplama Görevi',
-                  icon: Icons.playlist_add_check_rounded,
+                  icon: AppIcons.picking,
                 ),
           ),
         ],
@@ -233,7 +230,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         builder: (BuildContext context, GoRouterState state) =>
             const ModulePlaceholder(
               title: 'Stok Transferi',
-              icon: Icons.swap_horiz_rounded,
+              icon: AppIcons.transfer,
             ),
       ),
 
@@ -242,10 +239,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         path: AppRoutes.counts,
         name: AppRouteNames.counts,
         builder: (BuildContext context, GoRouterState state) =>
-            const ModulePlaceholder(
-              title: 'Stok Sayımı',
-              icon: Icons.fact_check_rounded,
-            ),
+            const ModulePlaceholder(title: 'Stok Sayımı', icon: AppIcons.count),
         routes: <RouteBase>[
           GoRoute(
             path: ':countId',
@@ -253,7 +247,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
             builder: (BuildContext context, GoRouterState state) =>
                 const ModulePlaceholder(
                   title: 'Sayım Detayı',
-                  icon: Icons.fact_check_rounded,
+                  icon: AppIcons.count,
                 ),
           ),
         ],
@@ -264,10 +258,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         path: AppRoutes.shipments,
         name: AppRouteNames.shipments,
         builder: (BuildContext context, GoRouterState state) =>
-            const ModulePlaceholder(
-              title: 'Sevkiyat',
-              icon: Icons.local_shipping_rounded,
-            ),
+            const ModulePlaceholder(title: 'Sevkiyat', icon: AppIcons.shipment),
         routes: <RouteBase>[
           GoRoute(
             path: ':shipmentId',
@@ -275,7 +266,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
             builder: (BuildContext context, GoRouterState state) =>
                 const ModulePlaceholder(
                   title: 'Sevkiyat Detayı',
-                  icon: Icons.local_shipping_rounded,
+                  icon: AppIcons.shipment,
                 ),
           ),
         ],
@@ -288,7 +279,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         builder: (BuildContext context, GoRouterState state) =>
             const ModulePlaceholder(
               title: 'Lokasyonlar',
-              icon: Icons.grid_view_rounded,
+              icon: AppIcons.locations,
             ),
         routes: <RouteBase>[
           GoRoute(
@@ -297,7 +288,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
             builder: (BuildContext context, GoRouterState state) =>
                 const ModulePlaceholder(
                   title: 'Lokasyon Detayı',
-                  icon: Icons.shelves,
+                  icon: AppIcons.locations,
                 ),
           ),
         ],
@@ -310,7 +301,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         builder: (BuildContext context, GoRouterState state) =>
             const ModulePlaceholder(
               title: 'Stok Hareketleri',
-              icon: Icons.history_rounded,
+              icon: AppIcons.movements,
             ),
       ),
       GoRoute(
@@ -319,7 +310,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         builder: (BuildContext context, GoRouterState state) =>
             const ModulePlaceholder(
               title: 'Bildirimler',
-              icon: Icons.notifications_rounded,
+              icon: AppIcons.notifications,
             ),
       ),
 
@@ -328,10 +319,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         path: AppRoutes.reports,
         name: AppRouteNames.reports,
         builder: (BuildContext context, GoRouterState state) =>
-            const ModulePlaceholder(
-              title: 'Raporlar',
-              icon: Icons.bar_chart_rounded,
-            ),
+            const ModulePlaceholder(title: 'Raporlar', icon: AppIcons.reports),
       ),
     ],
 
@@ -340,7 +328,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
       appBar: AppBar(title: const Text('Sayfa bulunamadı')),
       body: const ModulePlaceholder(
         title: 'Sayfa bulunamadı',
-        icon: Icons.error_outline_rounded,
+        icon: AppIcons.error,
         description: 'Aradığınız ekran mevcut değil.',
         showAppBar: false,
       ),

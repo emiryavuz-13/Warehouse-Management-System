@@ -56,9 +56,8 @@ class ModulePlaceholder extends StatelessWidget {
               const SizedBox(height: AppSpacing.sm),
               Text(
                 description ?? 'Bu modül sıradaki adımda eklenecek.',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(color: status.neutral),
+                style: Theme.of(context).textTheme.bodyMedium
+                    ?.copyWith(color: status.neutral),
                 textAlign: TextAlign.center,
               ),
             ],

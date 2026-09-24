@@ -15,10 +15,7 @@ import '../models/models.dart';
 
 /// Bir ürünün tek bir lokasyondaki miktarı.
 class LocationStock extends Equatable {
-  const LocationStock({
-    required this.location,
-    required this.quantity,
-  });
+  const LocationStock({required this.location, required this.quantity});
 
   final WarehouseLocation location;
   final int quantity;
@@ -102,10 +99,7 @@ class LocationSummary extends Equatable {
 
 /// Bir lokasyondaki tek ürün satırı — lokasyon detayında listelenir.
 class LocationStockLine extends Equatable {
-  const LocationStockLine({
-    required this.product,
-    required this.quantity,
-  });
+  const LocationStockLine({required this.product, required this.quantity});
 
   final Product product;
   final int quantity;

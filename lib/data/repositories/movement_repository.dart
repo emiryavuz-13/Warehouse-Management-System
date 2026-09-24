@@ -201,7 +201,10 @@ class MockMovementRepository implements MovementRepository {
 
     return DashboardSummary(
       totalProducts: _db.products.length,
-      totalStock: _db.stocks.fold<int>(0, (int sum, Stock s) => sum + s.quantity),
+      totalStock: _db.stocks.fold<int>(
+        0,
+        (int sum, Stock s) => sum + s.quantity,
+      ),
       criticalStockCount: critical,
       outOfStockCount: outOfStock,
       pendingOrderCount: pending,

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/providers/providers.dart';
 import '../../../app/theme/app_colors.dart';
+import '../../../app/theme/status_tone_colors.dart';
 
 /// Bottom navigation kabuğu (şartname 6. bölüm).
 ///
@@ -44,13 +45,13 @@ class AppShell extends ConsumerWidget {
           onDestinationSelected: _onDestinationSelected,
           destinations: <Widget>[
             const NavigationDestination(
-              icon: Icon(Icons.dashboard_outlined),
-              selectedIcon: Icon(Icons.dashboard_rounded),
+              icon: Icon(AppIcons.dashboard),
+              selectedIcon: Icon(AppIcons.dashboard),
               label: 'Ana Sayfa',
             ),
             const NavigationDestination(
-              icon: Icon(Icons.inventory_2_outlined),
-              selectedIcon: Icon(Icons.inventory_2_rounded),
+              icon: Icon(AppIcons.stock),
+              selectedIcon: Icon(AppIcons.stock),
               label: 'Stok',
             ),
             // Merkezi tarama aksiyonu — dolgulu daire ile vurgulanır.
@@ -67,20 +68,20 @@ class AppShell extends ConsumerWidget {
               label: 'Tara',
             ),
             const NavigationDestination(
-              icon: Icon(Icons.receipt_long_outlined),
-              selectedIcon: Icon(Icons.receipt_long_rounded),
+              icon: Icon(AppIcons.orders),
+              selectedIcon: Icon(AppIcons.orders),
               label: 'Siparişler',
             ),
             NavigationDestination(
               icon: Badge(
                 isLabelVisible: unread > 0,
                 label: Text('$unread'),
-                child: const Icon(Icons.person_outline_rounded),
+                child: const Icon(AppIcons.profile),
               ),
               selectedIcon: Badge(
                 isLabelVisible: unread > 0,
                 label: Text('$unread'),
-                child: const Icon(Icons.person_rounded),
+                child: const Icon(AppIcons.profile),
               ),
               label: 'Profil',
             ),
@@ -134,7 +135,7 @@ class _ScanIcon extends StatelessWidget {
               ]
             : null,
       ),
-      child: Icon(Icons.qr_code_scanner_rounded, size: 22, color: foreground),
+      child: Icon(AppIcons.scan, size: 22, color: foreground),
     );
   }
 }

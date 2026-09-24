@@ -21,12 +21,7 @@ class Zone extends Equatable {
   /// Görünen ad, ör. `A Bölgesi`.
   final String name;
 
-  Zone copyWith({
-    String? id,
-    String? warehouseId,
-    String? code,
-    String? name,
-  }) {
+  Zone copyWith({String? id, String? warehouseId, String? code, String? name}) {
     return Zone(
       id: id ?? this.id,
       warehouseId: warehouseId ?? this.warehouseId,

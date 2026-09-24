@@ -30,7 +30,12 @@ abstract final class AppSpacing {
   static const EdgeInsets cardPadding = EdgeInsets.all(lg);
 
   /// Liste ekranlarının alt boşluğu — son eleman FAB altında kalmasın diye.
-  static const EdgeInsets listPadding = EdgeInsets.fromLTRB(lg, lg, lg, xxl * 3);
+  static const EdgeInsets listPadding = EdgeInsets.fromLTRB(
+    lg,
+    lg,
+    lg,
+    xxl * 3,
+  );
 }
 
 /// Köşe yarıçapları. Kurumsal his için yumuşak ama abartısız değerler.

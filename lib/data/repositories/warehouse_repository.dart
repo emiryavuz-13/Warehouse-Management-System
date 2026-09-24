@@ -79,8 +79,7 @@ class MockWarehouseRepository implements WarehouseRepository {
         .where((WarehouseLocation l) {
           if (warehouseId != null && l.warehouseId != warehouseId) return false;
           if (zoneId != null && l.zoneId != zoneId) return false;
-          if (trimmed.isNotEmpty &&
-              !l.code.toLowerCase().contains(trimmed)) {
+          if (trimmed.isNotEmpty && !l.code.toLowerCase().contains(trimmed)) {
             return false;
           }
           return true;
@@ -105,9 +104,7 @@ class MockWarehouseRepository implements WarehouseRepository {
   }
 
   @override
-  Future<List<LocationStockLine>> getLocationContents(
-    String locationId,
-  ) async {
+  Future<List<LocationStockLine>> getLocationContents(String locationId) async {
     await _config.beforeRead();
 
     final List<LocationStockLine> lines = <LocationStockLine>[];
@@ -117,9 +114,7 @@ class MockWarehouseRepository implements WarehouseRepository {
     )) {
       final Product? product = _db.productById(stock.productId);
       if (product == null) continue;
-      lines.add(
-        LocationStockLine(product: product, quantity: stock.quantity),
-      );
+      lines.add(LocationStockLine(product: product, quantity: stock.quantity));
     }
 
     lines.sort(

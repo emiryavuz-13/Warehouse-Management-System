@@ -23,11 +23,12 @@ class OrderFilter {
   /// Yalnızca bugün oluşturulan siparişler.
   final bool onlyToday;
 
-  bool get isActive =>
-      statuses.isNotEmpty || priority != null || onlyToday;
+  bool get isActive => statuses.isNotEmpty || priority != null || onlyToday;
 
   int get activeCount =>
-      (statuses.isEmpty ? 0 : 1) + (priority == null ? 0 : 1) + (onlyToday ? 1 : 0);
+      (statuses.isEmpty ? 0 : 1) +
+      (priority == null ? 0 : 1) +
+      (onlyToday ? 1 : 0);
 
   OrderFilter copyWith({
     String? query,

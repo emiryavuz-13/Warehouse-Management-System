@@ -112,28 +112,27 @@ class MockProductRepository implements ProductRepository {
 
     final String query = filter.query.trim().toLowerCase();
 
-    List<ProductStockSummary> result = _db.products
-        .map(_summarize)
-        .where((ProductStockSummary s) {
-          if (query.isNotEmpty && !s.product.searchText.contains(query)) {
-            return false;
-          }
-          if (filter.categoryId != null &&
-              s.product.categoryId != filter.categoryId) {
-            return false;
-          }
-          if (filter.status != null && s.status != filter.status) {
-            return false;
-          }
-          if (filter.locationId != null) {
-            final bool atLocation = s.locations.any(
-              (LocationStock l) => l.location.id == filter.locationId,
-            );
-            if (!atLocation) return false;
-          }
-          return true;
-        })
-        .toList();
+    List<ProductStockSummary> result = _db.products.map(_summarize).where((
+      ProductStockSummary s,
+    ) {
+      if (query.isNotEmpty && !s.product.searchText.contains(query)) {
+        return false;
+      }
+      if (filter.categoryId != null &&
+          s.product.categoryId != filter.categoryId) {
+        return false;
+      }
+      if (filter.status != null && s.status != filter.status) {
+        return false;
+      }
+      if (filter.locationId != null) {
+        final bool atLocation = s.locations.any(
+          (LocationStock l) => l.location.id == filter.locationId,
+        );
+        if (!atLocation) return false;
+      }
+      return true;
+    }).toList();
 
     result = _sorted(result, filter.sort);
     return result;
@@ -229,17 +228,15 @@ class MockProductRepository implements ProductRepository {
     switch (sort) {
       case ProductSort.nameAsc:
         copy.sort(
-          (ProductStockSummary a, ProductStockSummary b) =>
-              a.product.name.toLowerCase().compareTo(
-                b.product.name.toLowerCase(),
-              ),
+          (ProductStockSummary a, ProductStockSummary b) => a.product.name
+              .toLowerCase()
+              .compareTo(b.product.name.toLowerCase()),
         );
       case ProductSort.nameDesc:
         copy.sort(
-          (ProductStockSummary a, ProductStockSummary b) =>
-              b.product.name.toLowerCase().compareTo(
-                a.product.name.toLowerCase(),
-              ),
+          (ProductStockSummary a, ProductStockSummary b) => b.product.name
+              .toLowerCase()
+              .compareTo(a.product.name.toLowerCase()),
         );
       case ProductSort.stockDesc:
         copy.sort(

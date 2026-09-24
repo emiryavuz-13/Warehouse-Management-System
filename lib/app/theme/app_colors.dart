@@ -165,19 +165,38 @@ class AppStatusColors extends ThemeExtension<AppStatusColors> {
     if (other is! AppStatusColors) return this;
     return AppStatusColors(
       success: Color.lerp(success, other.success, t)!,
-      successContainer: Color.lerp(successContainer, other.successContainer, t)!,
-      onSuccessContainer:
-          Color.lerp(onSuccessContainer, other.onSuccessContainer, t)!,
+      successContainer: Color.lerp(
+        successContainer,
+        other.successContainer,
+        t,
+      )!,
+      onSuccessContainer: Color.lerp(
+        onSuccessContainer,
+        other.onSuccessContainer,
+        t,
+      )!,
       warning: Color.lerp(warning, other.warning, t)!,
-      warningContainer: Color.lerp(warningContainer, other.warningContainer, t)!,
+      warningContainer: Color.lerp(
+        warningContainer,
+        other.warningContainer,
+        t,
+      )!,
       danger: Color.lerp(danger, other.danger, t)!,
       dangerContainer: Color.lerp(dangerContainer, other.dangerContainer, t)!,
       info: Color.lerp(info, other.info, t)!,
       infoContainer: Color.lerp(infoContainer, other.infoContainer, t)!,
       transfer: Color.lerp(transfer, other.transfer, t)!,
-      transferContainer: Color.lerp(transferContainer, other.transferContainer, t)!,
+      transferContainer: Color.lerp(
+        transferContainer,
+        other.transferContainer,
+        t,
+      )!,
       neutral: Color.lerp(neutral, other.neutral, t)!,
-      neutralContainer: Color.lerp(neutralContainer, other.neutralContainer, t)!,
+      neutralContainer: Color.lerp(
+        neutralContainer,
+        other.neutralContainer,
+        t,
+      )!,
       border: Color.lerp(border, other.border, t)!,
     );
   }

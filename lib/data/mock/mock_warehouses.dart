@@ -16,12 +16,7 @@ abstract final class MockWarehouses {
       city: 'İstanbul',
       isDefault: true,
     ),
-    Warehouse(
-      id: 'w-02',
-      code: 'AND',
-      name: 'Anadolu Depo',
-      city: 'Ankara',
-    ),
+    Warehouse(id: 'w-02', code: 'AND', name: 'Anadolu Depo', city: 'Ankara'),
   ];
 
   static const List<Zone> allZones = <Zone>[

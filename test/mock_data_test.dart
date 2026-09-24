@@ -18,17 +18,18 @@ void main() {
   final MockDataset data = MockDataset.seed(now: now);
 
   // Hızlı arama için kimlik kümeleri.
-  final Set<String> productIds =
-      data.products.map((Product p) => p.id).toSet();
-  final Set<String> categoryIds =
-      data.categories.map((ProductCategory c) => c.id).toSet();
-  final Set<String> warehouseIds =
-      data.warehouses.map((Warehouse w) => w.id).toSet();
+  final Set<String> productIds = data.products.map((Product p) => p.id).toSet();
+  final Set<String> categoryIds = data.categories
+      .map((ProductCategory c) => c.id)
+      .toSet();
+  final Set<String> warehouseIds = data.warehouses
+      .map((Warehouse w) => w.id)
+      .toSet();
   final Set<String> zoneIds = data.zones.map((Zone z) => z.id).toSet();
-  final Set<String> locationIds =
-      data.locations.map((WarehouseLocation l) => l.id).toSet();
-  final Set<String> orderIds =
-      data.orders.map((SalesOrder o) => o.id).toSet();
+  final Set<String> locationIds = data.locations
+      .map((WarehouseLocation l) => l.id)
+      .toSet();
+  final Set<String> orderIds = data.orders.map((SalesOrder o) => o.id).toSet();
   final Set<String> userIds = data.users.map((AppUser u) => u.id).toSet();
 
   /// Bir lokasyondaki belirli ürünün miktarı.
@@ -68,30 +69,52 @@ void main() {
   group('Kimlikler benzersiz', () {
     void expectUnique(String label, Iterable<String> ids) {
       final List<String> list = ids.toList();
-      expect(list.toSet().length, list.length, reason: '$label: tekrar eden id');
+      expect(
+        list.toSet().length,
+        list.length,
+        reason: '$label: tekrar eden id',
+      );
     }
 
     test('hiçbir listede tekrar eden kimlik yok', () {
       expectUnique('ürün', data.products.map((Product e) => e.id));
-      expectUnique('kategori', data.categories.map((ProductCategory e) => e.id));
+      expectUnique(
+        'kategori',
+        data.categories.map((ProductCategory e) => e.id),
+      );
       expectUnique('depo', data.warehouses.map((Warehouse e) => e.id));
       expectUnique('bölge', data.zones.map((Zone e) => e.id));
-      expectUnique('lokasyon', data.locations.map((WarehouseLocation e) => e.id));
+      expectUnique(
+        'lokasyon',
+        data.locations.map((WarehouseLocation e) => e.id),
+      );
       expectUnique('stok', data.stocks.map((Stock e) => e.id));
       expectUnique('sipariş', data.orders.map((SalesOrder e) => e.id));
       expectUnique('toplama', data.pickingTasks.map((PickingTask e) => e.id));
-      expectUnique('mal kabul', data.goodsReceipts.map((GoodsReceipt e) => e.id));
+      expectUnique(
+        'mal kabul',
+        data.goodsReceipts.map((GoodsReceipt e) => e.id),
+      );
       expectUnique('sevkiyat', data.shipments.map((Shipment e) => e.id));
-      expectUnique('sayım', data.inventoryCounts.map((InventoryCount e) => e.id));
+      expectUnique(
+        'sayım',
+        data.inventoryCounts.map((InventoryCount e) => e.id),
+      );
       expectUnique('hareket', data.movements.map((StockMovement e) => e.id));
-      expectUnique('bildirim', data.notifications.map((AppNotification e) => e.id));
+      expectUnique(
+        'bildirim',
+        data.notifications.map((AppNotification e) => e.id),
+      );
       expectUnique('kullanıcı', data.users.map((AppUser e) => e.id));
     });
 
     test('SKU ve barkodlar benzersiz', () {
-      final List<String> skus = data.products.map((Product p) => p.sku).toList();
-      final List<String> barcodes =
-          data.products.map((Product p) => p.barcode).toList();
+      final List<String> skus = data.products
+          .map((Product p) => p.sku)
+          .toList();
+      final List<String> barcodes = data.products
+          .map((Product p) => p.barcode)
+          .toList();
 
       expect(skus.toSet().length, skus.length);
       expect(barcodes.toSet().length, barcodes.length);
@@ -131,8 +154,9 @@ void main() {
     });
 
     test('tam olarak bir varsayılan depo var', () {
-      final int defaults =
-          data.warehouses.where((Warehouse w) => w.isDefault).length;
+      final int defaults = data.warehouses
+          .where((Warehouse w) => w.isDefault)
+          .length;
       expect(defaults, 1);
     });
   });
@@ -231,8 +255,9 @@ void main() {
     });
 
     test('altı sipariş durumu da temsil ediliyor', () {
-      final Set<OrderStatus> found =
-          data.orders.map((SalesOrder o) => o.status).toSet();
+      final Set<OrderStatus> found = data.orders
+          .map((SalesOrder o) => o.status)
+          .toSet();
 
       expect(found, containsAll(OrderStatus.values));
     });
@@ -253,7 +278,8 @@ void main() {
           expect(
             order.isFullyPicked,
             isTrue,
-            reason: '#${order.orderNumber} durumu ${order.status.label} ama '
+            reason:
+                '#${order.orderNumber} durumu ${order.status.label} ama '
                 'satırları eksik',
           );
         }
@@ -279,33 +305,37 @@ void main() {
     });
 
     test('bir siparişin en fazla bir toplama görevi var', () {
-      final List<String> taskOrderIds =
-          data.pickingTasks.map((PickingTask t) => t.orderId).toList();
+      final List<String> taskOrderIds = data.pickingTasks
+          .map((PickingTask t) => t.orderId)
+          .toList();
 
       expect(taskOrderIds.toSet().length, taskOrderIds.length);
     });
 
-    test('BEKLEYEN toplama satırlarının kaynak lokasyonunda yeterli stok var', () {
-      // Demo sırasında toplama adımının "yetersiz stok" ile durmaması için
-      // en kritik kontrol budur.
-      for (final PickingTask task in data.pickingTasks) {
-        if (task.status.isCompleted) continue;
+    test(
+      'BEKLEYEN toplama satırlarının kaynak lokasyonunda yeterli stok var',
+      () {
+        // Demo sırasında toplama adımının "yetersiz stok" ile durmaması için
+        // en kritik kontrol budur.
+        for (final PickingTask task in data.pickingTasks) {
+          if (task.status.isCompleted) continue;
 
-        for (final PickingLine line in task.lines) {
-          if (line.isCompleted) continue;
+          for (final PickingLine line in task.lines) {
+            if (line.isCompleted) continue;
 
-          final int available = stockAt(line.productId, line.locationId);
-          expect(
-            available,
-            greaterThanOrEqualTo(line.remainingQuantity),
-            reason:
-                '${task.code}: ${line.productId} için ${line.locationId} '
-                'lokasyonunda $available adet var, ${line.remainingQuantity} '
-                'adet gerekiyor',
-          );
+            final int available = stockAt(line.productId, line.locationId);
+            expect(
+              available,
+              greaterThanOrEqualTo(line.remainingQuantity),
+              reason:
+                  '${task.code}: ${line.productId} için ${line.locationId} '
+                  'lokasyonunda $available adet var, ${line.remainingQuantity} '
+                  'adet gerekiyor',
+            );
+          }
         }
-      }
-    });
+      },
+    );
 
     test('tamamlanmış görevlerin tüm satırları toplanmış', () {
       for (final PickingTask task in data.pickingTasks) {
@@ -339,24 +369,28 @@ void main() {
   });
 
   group('Mal kabul tutarlı', () {
-    test('her satır var olan ürüne, hedef lokasyon var olan lokasyona bağlı', () {
-      for (final GoodsReceipt receipt in data.goodsReceipts) {
-        expect(receipt.lines, isNotEmpty, reason: receipt.code);
+    test(
+      'her satır var olan ürüne, hedef lokasyon var olan lokasyona bağlı',
+      () {
+        for (final GoodsReceipt receipt in data.goodsReceipts) {
+          expect(receipt.lines, isNotEmpty, reason: receipt.code);
 
-        for (final GoodsReceiptLine line in receipt.lines) {
-          expect(productIds, contains(line.productId), reason: receipt.code);
+          for (final GoodsReceiptLine line in receipt.lines) {
+            expect(productIds, contains(line.productId), reason: receipt.code);
 
-          final String? target = line.targetLocationId;
-          if (target != null) {
-            expect(locationIds, contains(target), reason: receipt.code);
+            final String? target = line.targetLocationId;
+            if (target != null) {
+              expect(locationIds, contains(target), reason: receipt.code);
+            }
           }
         }
-      }
-    });
+      },
+    );
 
     test('üç mal kabul durumu da temsil ediliyor', () {
-      final Set<ReceiptStatus> found =
-          data.goodsReceipts.map((GoodsReceipt r) => r.status).toSet();
+      final Set<ReceiptStatus> found = data.goodsReceipts
+          .map((GoodsReceipt r) => r.status)
+          .toSet();
 
       expect(found, containsAll(ReceiptStatus.values));
     });
@@ -388,8 +422,9 @@ void main() {
     });
 
     test('bir siparişin en fazla bir sevkiyatı var', () {
-      final List<String> shipmentOrderIds =
-          data.shipments.map((Shipment s) => s.orderId).toList();
+      final List<String> shipmentOrderIds = data.shipments
+          .map((Shipment s) => s.orderId)
+          .toList();
 
       expect(shipmentOrderIds.toSet().length, shipmentOrderIds.length);
     });
@@ -447,8 +482,9 @@ void main() {
     });
 
     test('üç sayım durumu da temsil ediliyor', () {
-      final Set<CountStatus> found =
-          data.inventoryCounts.map((InventoryCount c) => c.status).toSet();
+      final Set<CountStatus> found = data.inventoryCounts
+          .map((InventoryCount c) => c.status)
+          .toSet();
 
       expect(found, containsAll(CountStatus.values));
     });
@@ -547,8 +583,9 @@ void main() {
     });
 
     test('yedi hareket türü de temsil ediliyor', () {
-      final Set<MovementType> found =
-          data.movements.map((StockMovement m) => m.type).toSet();
+      final Set<MovementType> found = data.movements
+          .map((StockMovement m) => m.type)
+          .toSet();
 
       expect(found, containsAll(MovementType.values));
     });
@@ -597,15 +634,17 @@ void main() {
 
   group('Bildirimler tutarlı', () {
     test('beş bildirim türünün tamamı temsil ediliyor', () {
-      final Set<NotificationType> found =
-          data.notifications.map((AppNotification n) => n.type).toSet();
+      final Set<NotificationType> found = data.notifications
+          .map((AppNotification n) => n.type)
+          .toSet();
 
       expect(found, containsAll(NotificationType.values));
     });
 
     test('okunmamış bildirim var — rozet görünür olsun', () {
-      final int unread =
-          data.notifications.where((AppNotification n) => !n.isRead).length;
+      final int unread = data.notifications
+          .where((AppNotification n) => !n.isRead)
+          .length;
 
       expect(unread, greaterThan(0));
     });
@@ -631,8 +670,9 @@ void main() {
   group('Demo senaryoları çalışabilir durumda', () {
     test('Demo 1: her demo barkodu bir ürüne karşılık geliyor', () {
       for (final String barcode in DemoBarcodes.featured) {
-        final bool found =
-            data.products.any((Product p) => p.barcode == barcode);
+        final bool found = data.products.any(
+          (Product p) => p.barcode == barcode,
+        );
         expect(found, isTrue, reason: '$barcode hiçbir ürüne ait değil');
       }
     });
@@ -664,8 +704,9 @@ void main() {
       final Product iphone = data.products.firstWhere(
         (Product p) => p.barcode == '8691234567890',
       );
-      final List<Stock> stocks =
-          data.stocks.where((Stock s) => s.productId == iphone.id).toList();
+      final List<Stock> stocks = data.stocks
+          .where((Stock s) => s.productId == iphone.id)
+          .toList();
 
       expect(stocks.length, greaterThanOrEqualTo(2));
       expect(totalStock(iphone.id), 24);

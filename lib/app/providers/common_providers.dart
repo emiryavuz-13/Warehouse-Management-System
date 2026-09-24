@@ -51,11 +51,12 @@ final FutureProvider<List<LocationSummary>> locationsProvider =
     });
 
 /// Okunmamış bildirim sayısı — bottom bar ve dashboard rozetleri.
-final FutureProvider<int> unreadNotificationCountProvider =
-    FutureProvider<int>((Ref ref) {
-      ref.watch(dataRevisionProvider);
-      return ref.watch(warehouseRepositoryProvider).getUnreadNotificationCount();
-    });
+final FutureProvider<int> unreadNotificationCountProvider = FutureProvider<int>(
+  (Ref ref) {
+    ref.watch(dataRevisionProvider);
+    return ref.watch(warehouseRepositoryProvider).getUnreadNotificationCount();
+  },
+);
 
 /// Bildirim listesi (şartname 20. bölüm).
 final FutureProvider<List<AppNotification>> notificationsProvider =

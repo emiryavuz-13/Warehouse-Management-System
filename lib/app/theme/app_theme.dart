@@ -179,7 +179,9 @@ abstract final class AppTheme {
         backgroundColor: scheme.surface,
         surfaceTintColor: Colors.transparent,
         showDragHandle: true,
-        shape: const RoundedRectangleBorder(borderRadius: AppRadius.sheetRadius),
+        shape: const RoundedRectangleBorder(
+          borderRadius: AppRadius.sheetRadius,
+        ),
       ),
 
       dialogTheme: DialogThemeData(

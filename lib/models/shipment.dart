@@ -45,8 +45,8 @@ class Shipment extends Equatable {
   /// Şartname 26. bölüm: sevk edilen sipariş yeniden sevk edilemez.
   bool get canShip => !status.isShipped;
 
-  String get searchText => '$code $carrier ${trackingNumber ?? ''}'
-      .toLowerCase();
+  String get searchText =>
+      '$code $carrier ${trackingNumber ?? ''}'.toLowerCase();
 
   Shipment copyWith({
     String? id,

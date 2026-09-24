@@ -73,7 +73,8 @@ class WarehouseDatabase {
 
   // --- Tekil arama ---
 
-  Product? productById(String id) => _firstOrNull(_data.products, (Product p) => p.id == id);
+  Product? productById(String id) =>
+      _firstOrNull(_data.products, (Product p) => p.id == id);
 
   Product? productByBarcode(String barcode) {
     final String trimmed = barcode.trim();
@@ -103,7 +104,8 @@ class WarehouseDatabase {
     );
   }
 
-  Zone? zoneById(String id) => _firstOrNull(_data.zones, (Zone z) => z.id == id);
+  Zone? zoneById(String id) =>
+      _firstOrNull(_data.zones, (Zone z) => z.id == id);
 
   Warehouse? warehouseById(String id) =>
       _firstOrNull(_data.warehouses, (Warehouse w) => w.id == id);
@@ -159,13 +161,15 @@ class WarehouseDatabase {
           .toList();
 
   /// Bir lokasyondaki tüm stok kayıtları.
-  List<Stock> stocksAtLocation(String locationId, {bool includeEmpty = false}) =>
-      _data.stocks
-          .where(
-            (Stock s) =>
-                s.locationId == locationId && (includeEmpty || s.quantity > 0),
-          )
-          .toList();
+  List<Stock> stocksAtLocation(
+    String locationId, {
+    bool includeEmpty = false,
+  }) => _data.stocks
+      .where(
+        (Stock s) =>
+            s.locationId == locationId && (includeEmpty || s.quantity > 0),
+      )
+      .toList();
 
   /// Bir lokasyonda kullanılan toplam kapasite.
   int usedCapacityOf(String locationId) => _data.stocks
@@ -535,8 +539,7 @@ class WarehouseDatabase {
     if (finished) {
       _addNotification(
         title: 'Toplama tamamlandı',
-        message:
-            'Sipariş #${order.orderNumber} toplandı, sevkiyata hazır.',
+        message: 'Sipariş #${order.orderNumber} toplandı, sevkiyata hazır.',
         type: NotificationType.newTask,
         targetRoute: '/orders/${order.id}',
       );

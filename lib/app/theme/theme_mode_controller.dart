@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'status_tone_colors.dart';
+
 /// Kullanıcının tema tercihini tutar ve cihazda saklar.
 ///
 /// Tercih profil ekranından değiştirilir. Varsayılan [ThemeMode.system]
@@ -66,8 +68,8 @@ extension ThemeModeLabelX on ThemeMode {
   };
 
   IconData get icon => switch (this) {
-    ThemeMode.system => Icons.brightness_auto_rounded,
-    ThemeMode.light => Icons.light_mode_rounded,
-    ThemeMode.dark => Icons.dark_mode_rounded,
+    ThemeMode.system => AppIcons.themeSystem,
+    ThemeMode.light => AppIcons.themeLight,
+    ThemeMode.dark => AppIcons.themeDark,
   };
 }

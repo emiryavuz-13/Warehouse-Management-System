@@ -405,7 +405,9 @@ void main() {
 
       expect(second.id, first.id);
       expect(
-        db.pickingTasks.where((PickingTask t) => t.orderId == 'ord-10453').length,
+        db.pickingTasks
+            .where((PickingTask t) => t.orderId == 'ord-10453')
+            .length,
         1,
       );
     });
@@ -531,9 +533,24 @@ void main() {
     });
 
     test('son satır toplanınca sipariş ve görev tamamlanır', () {
-      db.pickLine(taskId: 'pk-102', productId: iphone, quantity: 2, userId: user);
-      db.pickLine(taskId: 'pk-102', productId: usbCable, quantity: 5, userId: user);
-      db.pickLine(taskId: 'pk-102', productId: mouse, quantity: 1, userId: user);
+      db.pickLine(
+        taskId: 'pk-102',
+        productId: iphone,
+        quantity: 2,
+        userId: user,
+      );
+      db.pickLine(
+        taskId: 'pk-102',
+        productId: usbCable,
+        quantity: 5,
+        userId: user,
+      );
+      db.pickLine(
+        taskId: 'pk-102',
+        productId: mouse,
+        quantity: 1,
+        userId: user,
+      );
 
       final PickingTask task = db.pickingTaskById('pk-102')!;
       final SalesOrder order = db.orderById('ord-10452')!;
@@ -546,12 +563,23 @@ void main() {
     });
 
     test('parça parça toplama da desteklenir', () {
-      db.pickLine(taskId: 'pk-102', productId: usbCable, quantity: 2, userId: user);
-      db.pickLine(taskId: 'pk-102', productId: usbCable, quantity: 3, userId: user);
-
-      final PickingLine line = db.pickingTaskById('pk-102')!.lines.firstWhere(
-        (PickingLine l) => l.productId == usbCable,
+      db.pickLine(
+        taskId: 'pk-102',
+        productId: usbCable,
+        quantity: 2,
+        userId: user,
       );
+      db.pickLine(
+        taskId: 'pk-102',
+        productId: usbCable,
+        quantity: 3,
+        userId: user,
+      );
+
+      final PickingLine line = db
+          .pickingTaskById('pk-102')!
+          .lines
+          .firstWhere((PickingLine l) => l.productId == usbCable);
 
       expect(line.pickedQuantity, 5);
       expect(line.isCompleted, isTrue);
@@ -731,9 +759,24 @@ void main() {
     });
 
     test('toplama bitince sevkiyat açılabilir', () {
-      db.pickLine(taskId: 'pk-102', productId: iphone, quantity: 2, userId: user);
-      db.pickLine(taskId: 'pk-102', productId: usbCable, quantity: 5, userId: user);
-      db.pickLine(taskId: 'pk-102', productId: mouse, quantity: 1, userId: user);
+      db.pickLine(
+        taskId: 'pk-102',
+        productId: iphone,
+        quantity: 2,
+        userId: user,
+      );
+      db.pickLine(
+        taskId: 'pk-102',
+        productId: usbCable,
+        quantity: 5,
+        userId: user,
+      );
+      db.pickLine(
+        taskId: 'pk-102',
+        productId: mouse,
+        quantity: 1,
+        userId: user,
+      );
 
       final Shipment shipment = db.createShipment(orderId: 'ord-10452');
 
@@ -886,9 +929,24 @@ void main() {
       final int movementsBefore = db.movements.length;
 
       // 2. Üç ürünü sırayla topla
-      db.pickLine(taskId: 'pk-102', productId: iphone, quantity: 2, userId: user);
-      db.pickLine(taskId: 'pk-102', productId: usbCable, quantity: 5, userId: user);
-      db.pickLine(taskId: 'pk-102', productId: mouse, quantity: 1, userId: user);
+      db.pickLine(
+        taskId: 'pk-102',
+        productId: iphone,
+        quantity: 2,
+        userId: user,
+      );
+      db.pickLine(
+        taskId: 'pk-102',
+        productId: usbCable,
+        quantity: 5,
+        userId: user,
+      );
+      db.pickLine(
+        taskId: 'pk-102',
+        productId: mouse,
+        quantity: 1,
+        userId: user,
+      );
 
       // 3. Stok gerçekten azaldı
       expect(db.totalStockOf(iphone), iphoneBefore - 2);

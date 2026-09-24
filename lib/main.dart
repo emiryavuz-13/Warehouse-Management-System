@@ -18,7 +18,5 @@ Future<void> main() async {
 
   // Riverpod 3 basarisiz provider'lari varsayilan olarak yeniden dener ve
   // hata ~38 saniye gecikmeyle yuzeye cikar. Bkz. retry_policy.dart.
-  runApp(
-    ProviderScope(retry: noRetryPolicy, child: const WarehouseApp()),
-  );
+  runApp(ProviderScope(retry: noRetryPolicy, child: const WarehouseApp()));
 }

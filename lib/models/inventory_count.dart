@@ -58,10 +58,8 @@ class InventoryCountLine extends Equatable {
   ///
   /// [copyWith] `null` ile bunu yapamaz (null "değiştirme" anlamına gelir),
   /// bu yüzden ayrı bir metot gerekir.
-  InventoryCountLine clearCount() => InventoryCountLine(
-    productId: productId,
-    systemQuantity: systemQuantity,
-  );
+  InventoryCountLine clearCount() =>
+      InventoryCountLine(productId: productId, systemQuantity: systemQuantity);
 
   @override
   List<Object?> get props => <Object?>[

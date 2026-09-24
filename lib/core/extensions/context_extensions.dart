@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../app/theme/app_colors.dart';
+import '../../app/theme/status_tone_colors.dart';
+import '../../models/enums.dart';
 
 /// Ekranlarda sık tekrarlanan `Theme.of(context)` / `MediaQuery.of(context)`
 /// çağrılarını kısaltan yardımcılar.
@@ -22,15 +24,15 @@ extension BuildContextX on BuildContext {
 
   /// Başarı bildirimi. Yeşil ikon + metin, mevcut snackbar'ı iptal eder.
   void showSuccessSnack(String message) =>
-      _showSnack(message, Icons.check_circle_rounded, theme.status.success);
+      _showSnack(message, StatusTone.success.icon, theme.status.success);
 
   /// Hata/uyarı bildirimi — validation ve iş kuralı ihlallerinde.
   void showErrorSnack(String message) =>
-      _showSnack(message, Icons.error_rounded, theme.status.danger);
+      _showSnack(message, StatusTone.danger.icon, theme.status.danger);
 
   /// Nötr bilgilendirme.
   void showInfoSnack(String message) =>
-      _showSnack(message, Icons.info_rounded, theme.status.info);
+      _showSnack(message, StatusTone.info.icon, theme.status.info);
 
   void _showSnack(String message, IconData icon, Color accent) {
     final ScaffoldMessengerState messenger = ScaffoldMessenger.of(this);
