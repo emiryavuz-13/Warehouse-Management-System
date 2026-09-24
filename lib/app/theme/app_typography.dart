@@ -5,6 +5,32 @@ import 'package:flutter/material.dart';
 /// Şartname 5. bölüm "büyük ve okunabilir sayılar" maddesi gereği metrik
 /// gösterimleri için ayrı, belirgin stiller tanımlanmıştır.
 abstract final class AppTypography {
+  /// Dashboard'un liderlik ettiği tek sayı (dataviz: "hero figure").
+  ///
+  /// En az 48px ve gövde metniyle aynı yazı ailesinde. Ayrı bir display
+  /// veya serif yüz kullanmak markaya yabancı bir süs gibi okunur.
+  ///
+  /// Orantılı rakamlar kullanılır (varsayılan). `tabular-nums` her rakama
+  /// "0" genişliği verir; bu boyutta "121" gibi bir sayı dağınık görünür.
+  /// Tablo sütunları dışında tabular rakam kullanılmaz.
+  static const TextStyle heroFigure = TextStyle(
+    fontSize: 48,
+    fontWeight: FontWeight.w700,
+    height: 1.0,
+    letterSpacing: -1.5,
+  );
+
+  /// KPI bloklarının üst etiketi: küçük, seyrek harfli, sönük.
+  ///
+  /// Büyük harf ve harf aralığı, etiketi değerden görsel olarak ayırır;
+  /// böylece etiketin kendisi büyük punto olmadan da "başlık" gibi okunur.
+  static const TextStyle overline = TextStyle(
+    fontSize: 10.5,
+    fontWeight: FontWeight.w700,
+    letterSpacing: 0.8,
+    height: 1.2,
+  );
+
   /// Dashboard özet kartlarındaki büyük sayı (ör. "1.248").
   static const TextStyle metricLarge = TextStyle(
     fontSize: 28,

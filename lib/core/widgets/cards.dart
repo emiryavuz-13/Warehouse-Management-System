@@ -395,160 +395,74 @@ class MovementTile extends StatelessWidget {
   }
 }
 
-/// Dashboard özet kartı (şartname 7. bölüm).
+/// Hızlı işlem kısayolu (şartname 7, 29 ve 34. bölümler).
 ///
-/// Şartname "büyük ve okunabilir sayılar" istiyor; metrik [AppTypography]
-/// içindeki özel stille çizilir.
-class SummaryCard extends StatelessWidget {
-  const SummaryCard({
-    required this.label,
-    required this.value,
-    required this.icon,
-    this.tone,
-    this.suffix,
-    this.onTap,
-    super.key,
-  });
-
-  final String label;
-  final String value;
-  final IconData icon;
-  final StatusTone? tone;
-
-  /// Sayının yanındaki birim, ör. `adet`.
-  final String? suffix;
-
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppStatusColors status = Theme.of(context).status;
-    final StatusTone resolved = tone ?? StatusTone.neutral;
-    final Color accent = tone == null
-        ? Theme.of(context).colorScheme.primary
-        : resolved.foreground(context);
-
-    return AppCard(
-      onTap: onTap,
-      padding: const EdgeInsets.all(AppSpacing.md + 2),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              AppIconBox(
-                icon: icon,
-                size: 32,
-                iconSize: 16,
-                background: tone == null
-                    ? accent.withValues(alpha: 0.12)
-                    : resolved.background(context),
-                foreground: accent,
-              ),
-              const Spacer(),
-              if (onTap != null)
-                Icon(
-                  AppIcons.forward,
-                  size: AppSizes.iconSm,
-                  color: status.neutral,
-                ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: <Widget>[
-              Flexible(
-                child: Text(
-                  value,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypography.metricLarge,
-                ),
-              ),
-              if (suffix != null) ...<Widget>[
-                const SizedBox(width: AppSpacing.xs),
-                Text(
-                  suffix!,
-                  style: Theme.of(context).textTheme.bodySmall
-                      ?.copyWith(color: status.neutral),
-                ),
-              ],
-            ],
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodySmall
-                ?.copyWith(color: status.neutral),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Dashboard hızlı işlem kartı (şartname 7 ve 34. bölümler).
+/// Kart değil, dikey ikon + etiket. Kısayollar bilgi taşımıyor, yalnızca
+/// hedefe götürüyor; çerçeve vermek onları metriklerle aynı görsel ağırlığa
+/// çıkarıyor ve ekranı gereksiz çizgiyle dolduruyordu.
 ///
-/// Şartname 34. bölüm "Ürün Tara, Sipariş Topla, Stok Transferi" işlemlerinin
-/// bir-iki dokunuşta bulunmasını istiyor; bu kartlar o kısayolu sağlar.
+/// [isPrimary] tek bir kısayolu dolgulu daireyle öne çıkarır. Şartname 34.
+/// bölüm tarama işleminin en hızlı erişilen eylem olmasını istiyor.
 class QuickActionCard extends StatelessWidget {
   const QuickActionCard({
     required this.label,
     required this.icon,
     required this.onTap,
-    this.tone,
     this.badgeCount,
+    this.isPrimary = false,
     super.key,
   });
 
   final String label;
   final IconData icon;
   final VoidCallback onTap;
-  final StatusTone? tone;
 
-  /// Bekleyen iş sayısı — "3 sipariş toplanmayı bekliyor" gibi.
+  /// Bekleyen iş sayısı — "2 sipariş toplanmayı bekliyor" gibi.
   final int? badgeCount;
+
+  final bool isPrimary;
 
   @override
   Widget build(BuildContext context) {
-    final StatusTone resolved = tone ?? StatusTone.info;
-    final Color accent = resolved.foreground(context);
+    final AppStatusColors status = Theme.of(context).status;
+    final ColorScheme colors = Theme.of(context).colorScheme;
 
-    return AppCard(
+    return InkWell(
       onTap: onTap,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.md,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Badge(
-            isLabelVisible: badgeCount != null && badgeCount! > 0,
-            label: Text('$badgeCount'),
-            child: AppIconBox(
-              icon: icon,
-              size: 44,
-              iconSize: 20,
-              background: resolved.background(context),
-              foreground: accent,
+      borderRadius: BorderRadius.circular(AppRadius.md),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Badge(
+              isLabelVisible: badgeCount != null && badgeCount! > 0,
+              label: Text('$badgeCount'),
+              child: Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  color: isPrimary ? colors.primary : status.neutralContainer,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  size: 20,
+                  color: isPrimary ? colors.onPrimary : colors.onSurface,
+                ),
+              ),
             ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            label,
-            maxLines: 2,
-            textAlign: TextAlign.center,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodySmall
-                ?.copyWith(fontWeight: FontWeight.w600),
-          ),
-        ],
+            const SizedBox(height: AppSpacing.sm - 2),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(fontWeight: FontWeight.w600, fontSize: 11.5),
+            ),
+          ],
+        ),
       ),
     );
   }

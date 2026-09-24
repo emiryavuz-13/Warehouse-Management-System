@@ -65,7 +65,9 @@ void main() {
     expect(bar.destinations.length, 5);
     // Tara ortada: şartname 10 ve 34. bölümler merkezi tarama aksiyonu
     // istiyor.
-    expect(find.text('Tara'), findsOneWidget);
+    // Dashboard'daki hizli islem kisayolu da ayni etiketi kullandigi icin
+    // iki eslesme beklenir.
+    expect(find.text('Tara'), findsNWidgets(2));
     expect(find.text('Stok'), findsOneWidget);
     expect(find.text('Siparişler'), findsOneWidget);
     expect(find.text('Profil'), findsOneWidget);

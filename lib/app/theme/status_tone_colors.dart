@@ -140,6 +140,10 @@ abstract final class AppIcons {
   static const IconData refresh = LucideIcons.refreshCw;
   static const IconData barcode = LucideIcons.barcode;
 
+  // Trend gostergeleri
+  static const IconData trendUp = LucideIcons.arrowUp;
+  static const IconData trendDown = LucideIcons.arrowDown;
+
   // Durum ekranları
   static const IconData empty = LucideIcons.inbox;
   static const IconData error = LucideIcons.circleAlert;

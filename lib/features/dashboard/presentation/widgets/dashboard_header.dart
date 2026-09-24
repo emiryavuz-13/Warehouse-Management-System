@@ -86,7 +86,7 @@ class DashboardHeader extends ConsumerWidget {
             unreadCount: unread,
             onTap: () => context.push(AppRoutes.notifications),
           ),
-          const SizedBox(width: AppSpacing.sm),
+          const SizedBox(width: AppSpacing.xs),
           _AvatarButton(
             initials: user.value?.initials ?? '',
             background: colors.primary,
@@ -99,6 +99,11 @@ class DashboardHeader extends ConsumerWidget {
   }
 }
 
+/// Bildirim butonu.
+///
+/// Çerçevesiz: kenarlıklı bir kutu, rozet dışarı taştığı için kopuk
+/// görünüyordu ve başlıkta avatarla yarışıyordu. Başlıkta tek bir dolu
+/// öğe olsun — o da kullanıcı avatarı.
 class _NotificationButton extends StatelessWidget {
   const _NotificationButton({required this.unreadCount, required this.onTap});
 
@@ -107,27 +112,14 @@ class _NotificationButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AppStatusColors status = Theme.of(context).status;
-
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
-      borderRadius: BorderRadius.circular(AppRadius.md),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        child: Container(
-          width: AppSizes.minTouchTarget,
-          height: AppSizes.minTouchTarget,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppRadius.md),
-            border: Border.all(color: status.border),
-          ),
-          child: Badge(
-            isLabelVisible: unreadCount > 0,
-            label: Text('$unreadCount'),
-            child: Icon(AppIcons.notifications, size: AppSizes.iconMd),
-          ),
-        ),
+    return IconButton(
+      onPressed: onTap,
+      tooltip: 'Bildirimler',
+      iconSize: AppSizes.iconLg,
+      icon: Badge(
+        isLabelVisible: unreadCount > 0,
+        label: Text('$unreadCount'),
+        child: const Icon(AppIcons.notifications),
       ),
     );
   }

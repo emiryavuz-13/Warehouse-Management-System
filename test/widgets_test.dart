@@ -458,26 +458,45 @@ void main() {
     });
   });
 
-  group('SummaryCard', () {
-    testWidgets('büyük sayıyı ve etiketi gösterir', (
+  group('QuickActionCard', () {
+    testWidgets('etiket ve bekleyen is rozetini gosterir', (
       WidgetTester tester,
     ) async {
       await pumpDark(
         tester,
-        const SizedBox(
-          width: 160,
-          child: SummaryCard(
-            label: 'Toplam Stok',
-            value: '12.480',
-            icon: AppIcons.stock,
-            suffix: 'adet',
+        SizedBox(
+          width: 80,
+          child: QuickActionCard(
+            label: 'Mal Kabul',
+            icon: AppIcons.receiving,
+            badgeCount: 3,
+            onTap: () {},
           ),
         ),
       );
 
       expect(tester.takeException(), isNull);
-      expect(find.text('12.480'), findsOneWidget);
-      expect(find.text('Toplam Stok'), findsOneWidget);
+      expect(find.text('Mal Kabul'), findsOneWidget);
+      expect(find.text('3'), findsOneWidget);
+    });
+
+    testWidgets('bekleyen is yoksa rozet gizlenir', (
+      WidgetTester tester,
+    ) async {
+      await pumpDark(
+        tester,
+        SizedBox(
+          width: 80,
+          child: QuickActionCard(
+            label: 'Transfer',
+            icon: AppIcons.transfer,
+            badgeCount: 0,
+            onTap: () {},
+          ),
+        ),
+      );
+
+      expect(find.text('0'), findsNothing);
     });
   });
 

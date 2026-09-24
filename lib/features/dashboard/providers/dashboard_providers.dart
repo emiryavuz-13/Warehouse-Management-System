@@ -35,3 +35,16 @@ final FutureProvider<List<ProductStockSummary>> criticalProductsProvider =
           .watch(productRepositoryProvider)
           .getCriticalProducts(limit: AppConstants.dashboardCriticalStockCount);
     });
+
+/// Hero figürünün trend çubuklarını besleyen son 7 günlük hareket verisi
+/// (şartname 22. bölüm).
+///
+/// Özet metriklerinden ayrı bir sağlayıcı: hero'nun sayısı hazır olduğunda
+/// gösterilebilir, trend biraz sonra gelse de ekran bekletilmez.
+final FutureProvider<List<DailyMovementPoint>> dailyMovementsProvider =
+    FutureProvider<List<DailyMovementPoint>>((Ref ref) {
+      ref.watch(dataRevisionProvider);
+      return ref
+          .watch(movementRepositoryProvider)
+          .getDailyMovements(days: AppConstants.reportDayRange);
+    });

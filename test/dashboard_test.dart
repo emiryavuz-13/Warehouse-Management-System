@@ -6,13 +6,17 @@ import 'package:warehouse_management_system/app/app.dart';
 import 'package:warehouse_management_system/app/providers/providers.dart';
 import 'package:warehouse_management_system/core/widgets/widgets.dart';
 import 'package:warehouse_management_system/data/mock_config.dart';
+import 'package:warehouse_management_system/features/dashboard/presentation/widgets/dashboard_metrics.dart';
 
 /// Dashboard'u uçtan uca doğrular (şartname 7. bölüm).
 ///
-/// Testler gerçek uygulamayı, gerçek mock veriyle açar; sahte veri
-/// enjekte edilmez. Böylece "veri katmanından ekrana kadar zincir çalışıyor
-/// mu" sorusu da cevaplanmış olur — bir repository değişikliği dashboard'u
+/// Testler sahte veri enjekte etmiyor; gerçek uygulamayı gerçek mock veriyle
+/// açıyor. Böylece "veri katmanından ekrana kadar zincir çalışıyor mu"
+/// sorusu da cevaplanmış oluyor — bir repository değişikliği dashboard'u
 /// bozarsa burada görünür.
+///
+/// Görsel dil yeniden ele alındıktan sonra testler de dataviz sözleşmesine
+/// göre yazıldı: tek hero figürü, bağlamlı metrikler, duruma ayrılmış renk.
 void main() {
   setUpAll(() async {
     await initializeDateFormatting('tr_TR');
@@ -37,8 +41,8 @@ void main() {
 
   /// Dikey listeyi [target] görünene kadar kaydırır.
   ///
-  /// CustomScrollView ekran dışındaki slivarları oluşturmaz; ekranın altındaki
-  /// bölümleri test edebilmek için önce oraya kaydırmak gerekir.
+  /// CustomScrollView ekran dışındaki sliverları oluşturmaz; ekranın
+  /// altındaki bölümleri test edebilmek için önce oraya kaydırmak gerekir.
   Future<void> scrollTo(WidgetTester tester, Finder target) async {
     await tester.scrollUntilVisible(
       target,
@@ -65,18 +69,54 @@ void main() {
     });
   });
 
-  group('Özet kartları', () {
+  group('Hero figürü', () {
+    testWidgets('toplam stok tek büyük sayı olarak öne çıkar', (
+      WidgetTester tester,
+    ) async {
+      // dataviz: görünüm başına tam olarak bir hero figürü.
+      await openDashboard(tester);
+
+      expect(find.byType(HeroFigure), findsOneWidget);
+      expect(find.text('toplam stok'), findsOneWidget);
+      // Mock veride 496 adet stok var.
+      expect(find.text('496'), findsOneWidget);
+    });
+
+    testWidgets('haftalık değişim ve kırılım gösterilir', (
+      WidgetTester tester,
+    ) async {
+      // Çıplak sayı bağlam taşımaz; delta ve kırılım sözleşmenin parçası.
+      await openDashboard(tester);
+
+      expect(find.byType(DeltaLabel), findsWidgets);
+      expect(find.textContaining('bu hafta'), findsOneWidget);
+      expect(find.textContaining('giriş'), findsWidgets);
+      expect(find.textContaining('çıkış'), findsWidgets);
+    });
+
+    testWidgets('7 günlük trend çubukları çizilir', (
+      WidgetTester tester,
+    ) async {
+      await openDashboard(tester);
+
+      expect(find.byType(SparkBars), findsOneWidget);
+      expect(find.text('son 7 gün hareket'), findsOneWidget);
+    });
+  });
+
+  group('KPI blokları', () {
     testWidgets('şartnamedeki metrikleri gösterir', (
       WidgetTester tester,
     ) async {
       await openDashboard(tester);
 
-      expect(find.text('Toplam Ürün'), findsOneWidget);
-      expect(find.text('Toplam Stok'), findsOneWidget);
-      expect(find.text('Bekleyen Sipariş'), findsOneWidget);
-      expect(find.text('Toplanıyor'), findsOneWidget);
-      expect(find.text('Bugünkü Mal Kabul'), findsOneWidget);
-      expect(find.text('Bugünkü Sevkiyat'), findsOneWidget);
+      // Etiketler büyük harfle çizilir.
+      expect(find.text('ÜRÜN'), findsOneWidget);
+      expect(find.text('BEKLEYEN'), findsOneWidget);
+      expect(find.text('TOPLANIYOR'), findsOneWidget);
+      expect(find.text('MAL KABUL'), findsOneWidget);
+      expect(find.text('SEVKİYAT'), findsOneWidget);
+      expect(find.text('HAREKET'), findsOneWidget);
     });
 
     testWidgets('metrikler gerçek mock veriyle eşleşir', (
@@ -84,10 +124,9 @@ void main() {
     ) async {
       await openDashboard(tester);
 
-      // Mock veri seti 15 ürün içeriyor.
+      // Mock veri seti 15 ürün ve 4 kategori içeriyor.
       expect(find.text('15'), findsWidgets);
-      // Üç yeni sipariş var (#10453, #10454, #10460).
-      expect(find.text('Bekleyen Sipariş'), findsOneWidget);
+      expect(find.text('4 kategori'), findsOneWidget);
     });
 
     testWidgets('kritik stok uyarı şeridi görünür', (
@@ -96,8 +135,8 @@ void main() {
       // Mock veride 4 kritik + 1 tükenmiş ürün var.
       await openDashboard(tester);
 
+      expect(find.byType(StockAlertStrip), findsOneWidget);
       expect(find.textContaining('üründe stok uyarısı'), findsOneWidget);
-      expect(find.textContaining('kritik'), findsOneWidget);
     });
   });
 
@@ -105,27 +144,22 @@ void main() {
     testWidgets('beş kısayol da bulunuyor', (WidgetTester tester) async {
       await openDashboard(tester);
 
-      expect(find.text('Ürün Tara'), findsOneWidget);
-      expect(find.text('Mal Kabul'), findsOneWidget);
-      expect(find.text('Sipariş Topla'), findsOneWidget);
+      // Beş kısayol tek satıra sığar, kaydırma gerekmez.
+      expect(find.text('Mal Kabul'), findsWidgets);
+      expect(find.text('Topla'), findsOneWidget);
       expect(find.text('Transfer'), findsOneWidget);
-
-      // Beşinci kısayol yatay listede ekran dışında kalıyor; yana kaydır.
-      await tester.drag(
-        find.byType(QuickActionCard).first,
-        const Offset(-260, 0),
-      );
-      await tester.pumpAndSettle();
       expect(find.text('Sayım'), findsOneWidget);
+      // "Tara" hem kısayolda hem alt menüde bulunur.
+      expect(find.text('Tara'), findsNWidgets(2));
     });
 
-    testWidgets('"Ürün Tara" tarama sekmesine götürür', (
+    testWidgets('"Tara" kısayolu tarama sekmesine götürür', (
       WidgetTester tester,
     ) async {
       // Şartname 34: tarama bir-iki dokunuşta bulunmalı.
       await openDashboard(tester);
 
-      await tester.tap(find.text('Ürün Tara'));
+      await tester.tap(find.text('Tara').first);
       await tester.pumpAndSettle();
 
       expect(find.text('Barkod Tara'), findsWidgets);
@@ -151,15 +185,16 @@ void main() {
       await scrollTo(tester, find.text('Kritik Stok'));
 
       expect(find.text('Kritik Stok'), findsOneWidget);
-      // Tükenen ürün en üstte olmalı.
-      expect(find.text('Stok Yok'), findsWidgets);
+      // Tükenen ürün en üstte listelenir.
+      expect(find.text('Lenovo ThinkPad E14'), findsOneWidget);
     });
 
     testWidgets('eksik miktarı açıkça yazar', (WidgetTester tester) async {
       await openDashboard(tester);
       await scrollTo(tester, find.text('Kritik Stok'));
 
-      expect(find.textContaining('Minimum seviyenin'), findsWidgets);
+      // "7 adet eksik · min. 10" biçiminde.
+      expect(find.textContaining('eksik · min.'), findsWidgets);
     });
   });
 
@@ -169,22 +204,21 @@ void main() {
       await scrollTo(tester, find.text('Son Hareketler'));
 
       expect(find.text('Son Hareketler'), findsOneWidget);
-      expect(find.byType(MovementTile), findsWidgets);
+      expect(find.byType(DashboardMovementList), findsOneWidget);
     });
 
-    testWidgets('giriş ve çıkış hareketleri işaretli gösteriliyor', (
+    testWidgets('miktar işareti hareket yönünü taşır', (
       WidgetTester tester,
     ) async {
       await openDashboard(tester);
       await scrollTo(tester, find.text('Son Hareketler'));
 
-      final Finder tiles = find.byType(MovementTile);
-      expect(tiles, findsWidgets);
-      // En az bir işaretli miktar bulunmalı (+ veya -).
-      expect(
-        find.descendant(of: tiles.first, matching: find.byType(Text)),
-        findsWidgets,
-      );
+      // Giriş hareketi artı işaretli.
+      expect(find.text('+120'), findsOneWidget);
+      // Çıkış hareketi eksi işaretli.
+      expect(find.text('-10'), findsOneWidget);
+      // Transfer işaretsiz: toplam stok değişmediği için +/- yanıltıcı olur.
+      expect(find.text('+15'), findsNothing);
     });
   });
 
@@ -216,18 +250,17 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
 
-      final MockConfig config = MockConfig.instant();
-
       await tester.pumpWidget(
         ProviderScope(
           retry: noRetryPolicy,
-          overrides: [mockConfigProvider.overrideWithValue(config)],
+          overrides: [
+            mockConfigProvider.overrideWithValue(MockConfig.instant()),
+          ],
           child: const WarehouseApp(),
         ),
       );
       await tester.pumpAndSettle(const Duration(seconds: 2));
 
-      // Hata simülasyonunu aç ve yenile.
       final ProviderContainer container = ProviderScope.containerOf(
         tester.element(find.byType(WarehouseApp)),
       );

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/providers/providers.dart';
 import '../../../app/routes.dart';
+import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../core/widgets/widgets.dart';
 import '../../../data/views.dart';
@@ -16,10 +17,9 @@ import 'widgets/dashboard_metrics.dart';
 /// Uygulamanın operasyon merkezi: kullanıcı ne durumda olduğunu görür ve
 /// sık yaptığı işlere buradan başlar.
 ///
-/// **Bölümler bağımsız yüklenir.** Üç ayrı provider kullanılıyor; özet
-/// kartları hazır olduğunda gösteriliyor, kritik stok listesi kendi
-/// iskeletini çiziyor. Tek bir provider olsaydı en yavaş sorgu tüm ekranı
-/// bekletirdi.
+/// **Bölümler bağımsız yüklenir.** Dört ayrı provider kullanılıyor; özet
+/// hazır olduğunda metrikler, hareket verisi geldiğinde trend çubukları
+/// çiziliyor. Tek provider olsaydı en yavaş sorgu tüm ekranı bekletirdi.
 ///
 /// Aşağı çekerek yenileme tüm veriyi tazeler (şartname 33. bölüm).
 class DashboardPage extends ConsumerWidget {
@@ -40,39 +40,16 @@ class DashboardPage extends ConsumerWidget {
           child: CustomScrollView(
             // Veri kısa olsa bile aşağı çekme çalışmalı.
             physics: const AlwaysScrollableScrollPhysics(),
-            slivers: <Widget>[
-              const SliverToBoxAdapter(child: DashboardHeader()),
-
-              // --- Özet kartları ---
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: AppSpacing.screenPadding,
-                  child: _MetricsSection(),
-                ),
-              ),
-
-              // --- Hızlı işlemler ---
-              const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: AppSpacing.screenPadding,
-                  child: const SectionHeader(
-                    title: 'Hızlı İşlemler',
-                    padding: EdgeInsets.only(bottom: AppSpacing.md),
-                  ),
-                ),
-              ),
+            slivers: const <Widget>[
+              SliverToBoxAdapter(child: DashboardHeader()),
+              SliverToBoxAdapter(child: _MetricsSection()),
+              SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
               SliverToBoxAdapter(child: _QuickActionsSection()),
-
-              // --- Kritik stok ---
-              const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
+              SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
               SliverToBoxAdapter(child: _CriticalStockSection()),
-
-              // --- Son hareketler ---
-              const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
+              SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
               SliverToBoxAdapter(child: _RecentMovementsSection()),
-
-              const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xxl)),
+              SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xxl)),
             ],
           ),
         ),
@@ -81,45 +58,57 @@ class DashboardPage extends ConsumerWidget {
   }
 }
 
-/// Özet kartları bölümü.
+/// Hero figürü ve KPI blokları.
+///
+/// İki provider'ı birleştirir: özet sayıları ve 7 günlük hareket verisi.
+/// Trend verisi henüz gelmemişse hero yine çizilir, yalnızca çubuklar
+/// eksik kalır — sayı için trendi beklemek gereksiz.
 class _MetricsSection extends ConsumerWidget {
+  const _MetricsSection();
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<DashboardSummary> summary = ref.watch(
       dashboardSummaryProvider,
     );
+    final List<DailyMovementPoint> daily =
+        ref.watch(dailyMovementsProvider).value ?? const <DailyMovementPoint>[];
 
-    return AsyncValueView<DashboardSummary>(
-      value: summary,
-      onRetry: () => ref.invalidate(dashboardSummaryProvider),
-      loading: const LoadingState(child: _MetricsSkeleton()),
-      data: (DashboardSummary data) => DashboardMetrics(summary: data),
+    return Padding(
+      padding: AppSpacing.screenPadding,
+      child: AsyncValueView<DashboardSummary>(
+        value: summary,
+        onRetry: () => ref.invalidate(dashboardSummaryProvider),
+        loading: const LoadingState(child: _MetricsSkeleton()),
+        data: (DashboardSummary data) =>
+            DashboardMetrics(summary: data, dailyMovements: daily),
+      ),
     );
   }
 }
 
-/// Özet kartlarının iskeleti.
+/// Metriklerin iskeleti.
 ///
-/// Gerçek düzenle aynı: iki sütun, aynı kart yüksekliği. İçerik geldiğinde
-/// sayfa zıplamaz.
+/// Gerçek düzenle aynı: aynı hero yüksekliği, aynı ayraç konumları. İçerik
+/// geldiğinde sayfa zıplamaz.
 class _MetricsSkeleton extends StatelessWidget {
   const _MetricsSkeleton();
 
   @override
   Widget build(BuildContext context) {
+    final DateTime today = DateTime.now();
+
     return DashboardMetrics(
-      summary: const DashboardSummary(
-        totalProducts: 15,
-        totalStock: 1248,
-        criticalStockCount: 0,
-        outOfStockCount: 0,
-        pendingOrderCount: 3,
-        pickingOrderCount: 2,
-        readyToShipCount: 2,
-        todayReceiptCount: 1,
-        todayShipmentCount: 1,
-        unreadNotificationCount: 0,
-      ),
+      summary: const DashboardSummary.empty(),
+      dailyMovements: <DailyMovementPoint>[
+        for (int i = 6; i >= 0; i--)
+          DailyMovementPoint(
+            day: today.subtract(Duration(days: i)),
+            inbound: 0,
+            outbound: 0,
+            transferCount: 0,
+          ),
+      ],
     );
   }
 }
@@ -130,32 +119,28 @@ class _MetricsSkeleton extends StatelessWidget {
 /// ve şartname 34. bölümün "bir-iki dokunuş" hedefi yükleme sırasında da
 /// geçerli kalır.
 class _QuickActionsSection extends ConsumerWidget {
+  const _QuickActionsSection();
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final DashboardSummary summary =
         ref.watch(dashboardSummaryProvider).value ??
-        const DashboardSummary(
-          totalProducts: 0,
-          totalStock: 0,
-          criticalStockCount: 0,
-          outOfStockCount: 0,
-          pendingOrderCount: 0,
-          pickingOrderCount: 0,
-          readyToShipCount: 0,
-          todayReceiptCount: 0,
-          todayShipmentCount: 0,
-          unreadNotificationCount: 0,
-        );
+        const DashboardSummary.empty();
 
-    return DashboardQuickActions(summary: summary);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+      child: DashboardQuickActions(summary: summary),
+    );
   }
 }
 
-/// Kritik stok bölümü.
+/// Kritik stok bölümü (şartname 7. bölüm).
 ///
 /// Kritik ürün yoksa bölüm **hiç çizilmez**. "Kritik stok yok" diye boş bir
 /// kutu göstermek dashboard'u uzatır ve iyi haberi gereksiz yere vurgular.
 class _CriticalStockSection extends ConsumerWidget {
+  const _CriticalStockSection();
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<List<ProductStockSummary>> products = ref.watch(
@@ -172,14 +157,14 @@ class _CriticalStockSection extends ConsumerWidget {
         children: <Widget>[
           SectionHeader(
             title: 'Kritik Stok',
-            subtitle: 'Minimum seviyenin altındaki ürünler',
-            actionLabel: 'Tümünü gör',
+            actionLabel: 'Tümü',
             onAction: () => context.go(AppRoutes.stock),
+            padding: const EdgeInsets.only(bottom: AppSpacing.xs),
           ),
           AsyncValueView<List<ProductStockSummary>>(
             value: products,
             onRetry: () => ref.invalidate(criticalProductsProvider),
-            loading: const LoadingState(child: _CriticalStockSkeleton()),
+            loading: const LoadingState(child: _ListSkeleton(rows: 3)),
             isEmpty: (List<ProductStockSummary> items) => items.isEmpty,
             empty: const SizedBox.shrink(),
             data: (List<ProductStockSummary> items) => DashboardCriticalStock(
@@ -194,26 +179,10 @@ class _CriticalStockSection extends ConsumerWidget {
   }
 }
 
-class _CriticalStockSkeleton extends StatelessWidget {
-  const _CriticalStockSkeleton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        for (int i = 0; i < 2; i++) ...<Widget>[
-          if (i > 0) const SizedBox(height: AppSpacing.md),
-          const AppCard(
-            child: SizedBox(height: 44, child: Text('Ürün adı yükleniyor')),
-          ),
-        ],
-      ],
-    );
-  }
-}
-
 /// Son hareketler bölümü (şartname 7. bölüm).
 class _RecentMovementsSection extends ConsumerWidget {
+  const _RecentMovementsSection();
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<List<MovementDetail>> movements = ref.watch(
@@ -227,32 +196,23 @@ class _RecentMovementsSection extends ConsumerWidget {
         children: <Widget>[
           SectionHeader(
             title: 'Son Hareketler',
-            actionLabel: 'Tümünü gör',
+            actionLabel: 'Tümü',
             onAction: () => context.push(AppRoutes.movements),
+            padding: const EdgeInsets.only(bottom: AppSpacing.xs),
           ),
           AsyncValueView<List<MovementDetail>>(
             value: movements,
             onRetry: () => ref.invalidate(recentMovementsProvider),
-            loading: const LoadingState(child: _MovementsSkeleton()),
+            loading: const LoadingState(child: _ListSkeleton(rows: 4)),
             isEmpty: (List<MovementDetail> items) => items.isEmpty,
-            empty: const AppCard(
-              child: EmptyState(
-                message: 'Henüz stok hareketi yok.',
-                title: 'Hareket bulunmuyor',
-              ),
+            empty: const EmptyState(
+              message: 'Henüz stok hareketi yok.',
+              title: 'Hareket bulunmuyor',
             ),
-            data: (List<MovementDetail> items) => Column(
-              children: <Widget>[
-                for (int i = 0; i < items.length; i++) ...<Widget>[
-                  if (i > 0) const SizedBox(height: AppSpacing.sm),
-                  MovementTile(
-                    detail: items[i],
-                    onTap: () => context.push(
-                      AppRoutes.productDetail(items[i].product.id),
-                    ),
-                  ),
-                ],
-              ],
+            data: (List<MovementDetail> items) => DashboardMovementList(
+              movements: items,
+              onTap: (MovementDetail detail) =>
+                  context.push(AppRoutes.productDetail(detail.product.id)),
             ),
           ),
         ],
@@ -261,19 +221,29 @@ class _RecentMovementsSection extends ConsumerWidget {
   }
 }
 
-class _MovementsSkeleton extends StatelessWidget {
-  const _MovementsSkeleton();
+/// Ayraçla bölünmüş liste iskeleti.
+///
+/// Kritik stok ve son hareketler aynı düzeni kullandığı için tek iskelet
+/// ikisine de hizmet ediyor.
+class _ListSkeleton extends StatelessWidget {
+  const _ListSkeleton({required this.rows});
+
+  final int rows;
 
   @override
   Widget build(BuildContext context) {
+    final AppStatusColors status = Theme.of(context).status;
+
     return Column(
       children: <Widget>[
-        for (int i = 0; i < 4; i++) ...<Widget>[
-          if (i > 0) const SizedBox(height: AppSpacing.sm),
-          const AppCard(
+        for (int i = 0; i < rows; i++) ...<Widget>[
+          if (i > 0) Divider(height: 1, color: status.border),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
             child: SizedBox(
-              height: 52,
-              child: Text('Hareket kaydı yükleniyor'),
+              height: 36,
+              width: double.infinity,
+              child: Text('Kayıt yükleniyor'),
             ),
           ),
         ],

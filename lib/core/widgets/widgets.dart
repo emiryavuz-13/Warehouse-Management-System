@@ -19,5 +19,7 @@ export 'filter_sheet.dart';
 export 'info_widgets.dart';
 export 'module_placeholder.dart';
 export 'quantity_selector.dart';
+export 'sparkline.dart';
+export 'stat_blocks.dart';
 export 'state_views.dart';
 export 'status_badge.dart';

@@ -82,6 +82,10 @@ class WarehouseDatabase {
   }
 
   /// SKU veya barkoda göre arar — tarayıcı ekranı ikisini de kabul eder.
+  ///
+  /// Karşılaştırmada dil bağımsız `toUpperCase` kullanılır, Türkçe olan
+  /// değil: SKU ve barkodlar ASCII'dir (`IP15-128-BLK`), Türkçe kural
+  /// burada `i` harfini `İ`ye çevirerek eşleşmeyi bozardı.
   Product? productByCode(String code) {
     final String trimmed = code.trim().toUpperCase();
     return _firstOrNull(

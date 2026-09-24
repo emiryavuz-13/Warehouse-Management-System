@@ -199,7 +199,13 @@ class MockMovementRepository implements MovementRepository {
       return _isSameDay(r.expectedDate, startOfToday) && !r.status.isCompleted;
     }).length;
 
+    final int todayMovements = _db.movements
+        .where((StockMovement m) => !m.timestamp.isBefore(startOfToday))
+        .length;
+
     return DashboardSummary(
+      categoryCount: _db.categories.length,
+      todayMovementCount: todayMovements,
       totalProducts: _db.products.length,
       totalStock: _db.stocks.fold<int>(
         0,

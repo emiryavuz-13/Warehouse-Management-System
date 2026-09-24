@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../core/extensions/string_extensions.dart';
+
 import 'enums.dart';
 
 /// Uygulamayı kullanan depo personeli (şartname 21. bölüm).
@@ -41,10 +43,10 @@ class AppUser extends Equatable {
         .toList();
     if (words.isEmpty) return '?';
     if (words.length == 1) {
-      return words.first.substring(0, 1).toUpperCase();
+      return words.first.substring(0, 1).toUpperCaseTr();
     }
     return (words.first.substring(0, 1) + words.last.substring(0, 1))
-        .toUpperCase();
+        .toUpperCaseTr();
   }
 
   /// Dashboard başlığındaki selamlamada kullanılan ilk ad.

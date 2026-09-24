@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../core/extensions/string_extensions.dart';
+
 /// Depoda tutulan fiziksel ürün.
 ///
 /// Ürün, stok miktarını **taşımaz**. Miktar her zaman lokasyon bazında
@@ -51,9 +53,10 @@ class Product extends Equatable {
         .toList();
     if (words.isEmpty) return '?';
     if (words.length == 1) {
-      return words.first.substring(0, 1).toUpperCase();
+      return words.first.substring(0, 1).toUpperCaseTr();
     }
-    return (words[0].substring(0, 1) + words[1].substring(0, 1)).toUpperCase();
+    return (words[0].substring(0, 1) + words[1].substring(0, 1))
+        .toUpperCaseTr();
   }
 
   /// Arama kutusunun eşleştirmesi için tek bir metin.

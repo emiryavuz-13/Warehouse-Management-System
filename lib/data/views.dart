@@ -172,6 +172,8 @@ class DailyMovementPoint extends Equatable {
 /// Dashboard'un özet metrikleri (şartname 7. bölüm).
 class DashboardSummary extends Equatable {
   const DashboardSummary({
+    required this.categoryCount,
+    required this.todayMovementCount,
     required this.totalProducts,
     required this.totalStock,
     required this.criticalStockCount,
@@ -183,6 +185,34 @@ class DashboardSummary extends Equatable {
     required this.todayShipmentCount,
     required this.unreadNotificationCount,
   });
+
+  /// Tüm sayaçları sıfır olan özet.
+  ///
+  /// İskelet gösteriminde ve veri gelmeden önce kullanılır; on alanı her
+  /// çağrı yerinde tek tek yazmak yerine buradan alınır.
+  const DashboardSummary.empty()
+    : categoryCount = 0,
+      todayMovementCount = 0,
+      totalProducts = 0,
+      totalStock = 0,
+      criticalStockCount = 0,
+      outOfStockCount = 0,
+      pendingOrderCount = 0,
+      pickingOrderCount = 0,
+      readyToShipCount = 0,
+      todayReceiptCount = 0,
+      todayShipmentCount = 0,
+      unreadNotificationCount = 0;
+
+  /// Katalogdaki kategori sayısı — ürün metriğinin alt etiketi.
+  final int categoryCount;
+
+  /// Bugün oluşan stok hareketi sayısı.
+  ///
+  /// Şartname 24. bölümün "işlem gerçekten state'i değiştirmeli" maddesinin
+  /// dashboard'daki karşılığı: kullanıcı bir transfer yaptığında bu sayı
+  /// gözünün önünde artar.
+  final int todayMovementCount;
 
   /// Katalogdaki ürün çeşidi sayısı.
   final int totalProducts;
@@ -218,6 +248,8 @@ class DashboardSummary extends Equatable {
 
   @override
   List<Object?> get props => <Object?>[
+    categoryCount,
+    todayMovementCount,
     totalProducts,
     totalStock,
     criticalStockCount,
