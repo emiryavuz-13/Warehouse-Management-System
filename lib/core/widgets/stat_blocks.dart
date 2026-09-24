@@ -217,6 +217,7 @@ class StatBlock extends StatelessWidget {
     this.delta,
     this.tone,
     this.onTap,
+    this.isSelected = false,
     super.key,
   });
 
@@ -238,9 +239,19 @@ class StatBlock extends StatelessWidget {
 
   final VoidCallback? onTap;
 
+  /// Blok aynı zamanda bir filtre düğmesi olarak kullanıldığında seçili
+  /// olanı işaretler: etiket vurgulanır ve altına ince bir çizgi çekilir.
+  ///
+  /// Seçimi renk soldurmayla değil çizgiyle göstermek gerekir; soluk bir
+  /// blok "devre dışı" gibi okunur.
+  final bool isSelected;
+
   @override
   Widget build(BuildContext context) {
     final AppStatusColors status = Theme.of(context).status;
+    final Color accent = tone == null
+        ? Theme.of(context).colorScheme.primary
+        : tone!.foreground(context);
     final Color valueColor = tone == null
         ? Theme.of(context).colorScheme.onSurface
         : tone!.foreground(context);
@@ -253,7 +264,9 @@ class StatBlock extends StatelessWidget {
           label.toUpperCaseTr(),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: AppTypography.overline.copyWith(color: status.neutral),
+          style: AppTypography.overline.copyWith(
+            color: isSelected ? accent : status.neutral,
+          ),
         ),
         const SizedBox(height: AppSpacing.xs + 2),
         Text(
@@ -273,6 +286,17 @@ class StatBlock extends StatelessWidget {
             style: Theme.of(context).textTheme.bodySmall
                 ?.copyWith(color: status.neutral),
           ),
+        if (isSelected) ...<Widget>[
+          const SizedBox(height: AppSpacing.sm - 2),
+          Container(
+            height: 2,
+            width: 20,
+            decoration: BoxDecoration(
+              color: accent,
+              borderRadius: BorderRadius.circular(AppRadius.pill),
+            ),
+          ),
+        ],
       ],
     );
 

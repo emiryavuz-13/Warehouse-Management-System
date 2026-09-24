@@ -8,6 +8,7 @@ import '../features/products/presentation/product_detail_page.dart';
 import '../features/products/presentation/product_list_page.dart';
 import '../features/shell/presentation/app_shell.dart';
 import '../features/splash/presentation/splash_page.dart';
+import '../features/stock/presentation/stock_list_page.dart';
 import 'routes.dart';
 import 'theme/status_tone_colors.dart';
 
@@ -70,14 +71,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                 path: AppRoutes.stock,
                 name: AppRouteNames.stock,
                 builder: (BuildContext context, GoRouterState state) =>
-                    const ModulePlaceholder(
-                      title: 'Stok',
-                      icon: AppIcons.stock,
-                      description:
-                          'Operasyonel stok listesi ve stok detayı '
-                          'sıradaki adımlarda eklenecek.',
-                      showAppBar: false,
-                    ),
+                    const StockListPage(),
               ),
             ],
           ),

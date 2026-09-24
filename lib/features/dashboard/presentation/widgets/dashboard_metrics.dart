@@ -498,7 +498,7 @@ class _MovementRow extends StatelessWidget {
                     <String>[
                       movement.type.label,
                       movement.reference,
-                      if (route != null) route,
+                      ?route,
                     ].join(' · '),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
