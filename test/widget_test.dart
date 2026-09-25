@@ -88,13 +88,8 @@ void main() {
     await tester.tap(find.text('Profil'));
     await tester.pumpAndSettle();
 
-    expect(
-      find.text(
-        'Kullanıcı bilgileri, yetkiler ve tema ayarı sıradaki adımlarda '
-        'eklenecek.',
-      ),
-      findsOneWidget,
-    );
+    expect(find.text('Emir Yavuz'), findsWidgets);
+    expect(find.text('Yetkiler'), findsOneWidget);
   });
 
   testWidgets('sekme değişince önceki sekme durumu korunur', (

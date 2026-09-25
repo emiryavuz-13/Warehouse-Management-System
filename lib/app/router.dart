@@ -10,10 +10,14 @@ import '../features/products/presentation/product_detail_page.dart';
 import '../features/products/presentation/product_list_page.dart';
 import '../features/locations/presentation/location_detail_page.dart';
 import '../features/locations/presentation/locations_page.dart';
+import '../features/movements/presentation/movements_page.dart';
+import '../features/notifications/presentation/notifications_page.dart';
 import '../features/orders/presentation/order_detail_page.dart';
 import '../features/orders/presentation/orders_page.dart';
 import '../features/orders/presentation/picking_page.dart';
+import '../features/profile/presentation/profile_page.dart';
 import '../features/receiving/presentation/putaway_page.dart';
+import '../features/reports/presentation/reports_page.dart';
 import '../features/receiving/presentation/receipt_detail_page.dart';
 import '../features/receiving/presentation/receiving_list_page.dart';
 import '../features/scan/presentation/scan_page.dart';
@@ -122,14 +126,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                 path: AppRoutes.profile,
                 name: AppRouteNames.profile,
                 builder: (BuildContext context, GoRouterState state) =>
-                    const ModulePlaceholder(
-                      title: 'Profil',
-                      icon: AppIcons.profile,
-                      description:
-                          'Kullanıcı bilgileri, yetkiler ve tema ayarı '
-                          'sıradaki adımlarda eklenecek.',
-                      showAppBar: false,
-                    ),
+                    const ProfilePage(),
               ),
             ],
           ),
@@ -277,20 +274,15 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
       GoRoute(
         path: AppRoutes.movements,
         name: AppRouteNames.movements,
-        builder: (BuildContext context, GoRouterState state) =>
-            const ModulePlaceholder(
-              title: 'Stok Hareketleri',
-              icon: AppIcons.movements,
-            ),
+        builder: (BuildContext context, GoRouterState state) => MovementsPage(
+          productId: state.uri.queryParameters['productId'],
+        ),
       ),
       GoRoute(
         path: AppRoutes.notifications,
         name: AppRouteNames.notifications,
         builder: (BuildContext context, GoRouterState state) =>
-            const ModulePlaceholder(
-              title: 'Bildirimler',
-              icon: AppIcons.notifications,
-            ),
+            const NotificationsPage(),
       ),
 
       // Raporlar (şartname 22. bölüm)
@@ -298,7 +290,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         path: AppRoutes.reports,
         name: AppRouteNames.reports,
         builder: (BuildContext context, GoRouterState state) =>
-            const ModulePlaceholder(title: 'Raporlar', icon: AppIcons.reports),
+            const ReportsPage(),
       ),
     ],
 
