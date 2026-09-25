@@ -188,8 +188,6 @@ class _Body extends ConsumerWidget {
           padding: EdgeInsets.only(bottom: AppSpacing.md),
         ),
         const _ThemeSelector(),
-        const SizedBox(height: AppSpacing.lg),
-        const _ErrorSimulationSwitch(),
 
         const SizedBox(height: AppSpacing.xl),
         Divider(height: 1, color: status.border),
@@ -396,56 +394,6 @@ class _ThemeSelector extends ConsumerWidget {
               ),
             ],
           ],
-        ),
-      ],
-    );
-  }
-}
-
-/// Hata simülasyonu anahtarı (şartname 25. bölüm).
-///
-/// Demo sırasında error durumlarını göstermek için. Yazma işlemleri
-/// etkilenmez — kullanıcı yaptığı transferi kaybetmemeli.
-class _ErrorSimulationSwitch extends ConsumerWidget {
-  const _ErrorSimulationSwitch();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final bool enabled = ref.watch(errorSimulationProvider);
-    final AppStatusColors status = Theme.of(context).status;
-
-    return Row(
-      children: <Widget>[
-        Icon(
-          AppIcons.error,
-          size: AppSizes.iconMd,
-          color: enabled ? status.danger : status.neutral,
-        ),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                'Hata simülasyonu',
-                style: Theme.of(context).textTheme.bodyMedium
-                    ?.copyWith(fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 1),
-              Text(
-                'Okuma işlemleri başarısız olur, hata ekranları görünür. '
-                'Kaydetme işlemleri etkilenmez.',
-                style: Theme.of(context).textTheme.bodySmall
-                    ?.copyWith(color: status.neutral),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: AppSpacing.sm),
-        Switch(
-          value: enabled,
-          onChanged: (bool value) =>
-              ref.read(errorSimulationProvider.notifier).set(value),
         ),
       ],
     );

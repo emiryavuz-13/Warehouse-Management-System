@@ -104,23 +104,24 @@ void main() {
       expect(container.read(themeModeProvider), ThemeMode.dark);
     });
 
-    testWidgets('hata simülasyonu anahtarı çalışır', (
+    testWidgets('hata simülasyonu anahtarı arayüzde yok', (
       WidgetTester tester,
     ) async {
-      final ProviderContainer container = await openProfile(tester);
+      // Demo sırasında yanlışlıkla açılıp bütün ekranları hataya
+      // düşürüyordu. Mekanizma duruyor ama düğmesi yok.
+      await openProfile(tester);
       await tester.scrollUntilVisible(
-        find.text('Hata simülasyonu'),
+        find.text('TEMA'),
         300,
         scrollable: find.byType(Scrollable).first,
       );
       await tester.pumpAndSettle();
 
-      expect(container.read(errorSimulationProvider), isFalse);
-
-      await tester.tap(find.byType(Switch));
-      await tester.pumpAndSettle();
-
-      expect(container.read(errorSimulationProvider), isTrue);
+      // Ayarlar bölümü çizildi; tema seçici var, anahtar yok.
+      expect(find.text('Ayarlar'), findsOneWidget);
+      expect(find.text('Koyu'), findsOneWidget);
+      expect(find.text('Hata simülasyonu'), findsNothing);
+      expect(find.byType(Switch), findsNothing);
     });
 
     testWidgets('bottom bar\'da yeri olmayan modüller buradan açılır', (
@@ -180,8 +181,9 @@ void main() {
         movementListProvider.future,
       );
       expect(
-        items.every((MovementDetail m) =>
-            m.movement.type == MovementType.transfer),
+        items.every(
+          (MovementDetail m) => m.movement.type == MovementType.transfer,
+        ),
         isTrue,
       );
     });
@@ -229,14 +231,16 @@ void main() {
         'Bildirimler',
       );
 
-      final int before =
-          await container.read(unreadNotificationCountProvider.future);
+      final int before = await container.read(
+        unreadNotificationCountProvider.future,
+      );
 
       await tester.tap(find.text('Kritik stok').first);
       await tester.pumpAndSettle();
 
-      final int after =
-          await container.read(unreadNotificationCountProvider.future);
+      final int after = await container.read(
+        unreadNotificationCountProvider.future,
+      );
       expect(after, before - 1);
     });
 
@@ -251,10 +255,7 @@ void main() {
       await tester.tap(find.text('Tümünü okundu yap'));
       await tester.pumpAndSettle();
 
-      expect(
-        await container.read(unreadNotificationCountProvider.future),
-        0,
-      );
+      expect(await container.read(unreadNotificationCountProvider.future), 0);
       expect(find.textContaining('tümü okundu'), findsOneWidget);
     });
   });

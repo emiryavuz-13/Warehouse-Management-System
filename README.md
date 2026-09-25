@@ -93,9 +93,6 @@ iPhone 15'in 24 adet stoğu ve iki raftaki dağılımı (`A-01-01 → 18`,
 > edilmiş sayılır. Sevk **stok hareketi üretmez** — mal zaten toplama
 > sırasında raftan düşmüştür.
 
-**Hata ekranlarını görmek için:** Profil → Ayarlar → *Hata simülasyonu*.
-Okuma işlemleri başarısız olur, yazma işlemleri etkilenmez.
-
 ---
 
 ## Mimari

@@ -85,6 +85,10 @@ final Provider<MovementRepository> movementRepositoryProvider =
 
 /// Hata simülasyonu anahtarı (şartname 25. bölüm).
 ///
+/// Arayüzde bir düğmesi yok: demo sırasında yanlışlıkla açılıp ekranların
+/// hata vermesi, anlatılmak istenen şeyi gölgeliyordu. Mekanizma duruyor —
+/// hata ekranları testlerden bu anahtarla sürülüyor.
+///
 /// Profil ekranından açılır. Açıkken tüm okuma işlemleri başarısız olur ve
 /// ekranların error durumları demo sırasında gösterilebilir. Yazma işlemleri
 /// etkilenmez — kullanıcı yaptığı transferi kaybetmemeli.
