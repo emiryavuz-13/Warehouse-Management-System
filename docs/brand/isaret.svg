@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="6 19 36 21.5" width="360" height="215" role="img" aria-label="Depom Düzende">
+  <title>Depom Düzende</title>
+  <!-- Raf: hepsinin üstünde durduğu ortak taban -->
+  <rect x="6" y="36" width="36" height="4.5" rx="2.25" fill="#16191f"/>
+  <!-- Üç koli: aynı tabana oturmuş, eşit aralıklı -->
+  <rect x="8.5" y="24" width="8.5" height="11" rx="2" fill="#16191f"/>
+  <rect x="19.75" y="19" width="8.5" height="16" rx="2" fill="#1f5fd6"/>
+  <rect x="31" y="27" width="8.5" height="8" rx="2" fill="#16191f"/>
+</svg>

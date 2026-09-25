@@ -66,15 +66,12 @@ class _SplashPageState extends ConsumerState<SplashPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            // Marka işareti yalnızca burada ve profilde görünür;
-            // operasyonel ekranlarda logo yoktur.
-            const IstifMark(size: 84),
+            // Marka yalnızca burada ve profilde görünür; operasyonel
+            // ekranlarda logo yoktur.
+            const BrandMark(size: 104),
             const SizedBox(height: AppSpacing.xl),
-            Text(
-              AppConstants.appName,
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: AppSpacing.xs),
+            const BrandWordmark(fontSize: 27),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               AppConstants.appTagline,
               style: Theme.of(context).textTheme.bodyMedium

@@ -196,7 +196,7 @@ class _Body extends ConsumerWidget {
         Center(
           child: Column(
             children: <Widget>[
-              const IstifLockup(markSize: 34),
+              const BrandLockup(markSize: 40),
               const SizedBox(height: AppSpacing.md),
               Text(
                 'Sürüm ${AppConstants.appVersion} · demo sürümü\n'

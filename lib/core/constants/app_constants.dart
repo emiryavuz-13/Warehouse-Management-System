@@ -5,9 +5,16 @@
 abstract final class AppConstants {
   /// Uygulama adı.
   ///
-  /// *İstif* deponun kendi sözcüğü: malı rafa düzenli biçimde yerleştirmek.
-  /// Marka işareti için [IstifMark].
-  static const String appName = 'İstif';
+  /// Bir isimden çok bir iddia: *depom düzende*. Yazılışında "Depom" ince,
+  /// "Düzende" kalındır — [BrandWordmark] bunu kuruyor.
+  static const String appName = 'Depom Düzende';
+
+  /// Ana ekranda ikonun altında yazan kısa ad.
+  ///
+  /// Android bu alanda yaklaşık 11-12 karakter gösterir; tam ad orada
+  /// "Depom Düze…" diye kesilirdi. Kısa çağırma adı ile tam adın ayrılması
+  /// yaygın bir uygulamadır.
+  static const String appShortName = 'Depom';
 
   /// Adın altında duran açıklama — açılış ve profil ekranında.
   static const String appTagline = 'Depo Yönetim Sistemi';

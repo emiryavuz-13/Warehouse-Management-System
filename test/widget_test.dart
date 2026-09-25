@@ -30,9 +30,11 @@ void main() {
     await tester.pumpWidget(buildApp());
     await tester.pump();
 
-    expect(find.text('İstif'), findsOneWidget);
+    // Ad tek bir metin olarak kurulur; "Depom" ve "Düzende" iki ayrı
+    // yazı olsaydı satır sonunda bölünebilirdi.
+    expect(find.text('Depom Düzende'), findsOneWidget);
     expect(find.text('Depo Yönetim Sistemi'), findsOneWidget);
-    expect(find.byType(IstifMark), findsOneWidget);
+    expect(find.byType(BrandMark), findsOneWidget);
 
     final MaterialApp app = tester.widget<MaterialApp>(
       find.byType(MaterialApp),
