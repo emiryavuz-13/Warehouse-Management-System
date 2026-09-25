@@ -15,6 +15,7 @@ import '../../../models/models.dart';
 import '../../scan/presentation/widgets/barcode_verify_sheet.dart';
 import '../../shipments/presentation/widgets/ship_action.dart';
 import '../providers/order_providers.dart';
+import 'widgets/picking_sheets.dart';
 
 /// Toplama görevi (şartname 14. bölüm).
 ///
@@ -51,6 +52,15 @@ class _PickingPageState extends ConsumerState<PickingPage> {
   /// doğrulama kendiliğinden düşsün, çalışan her ürünü ayrı okutsun.
   String? _verifiedProductId;
 
+  /// Kullanıcının elle seçtiği adım. `null` ise sıradaki adım gösterilir.
+  ///
+  /// Toplama bir öneri sırasıdır, zorunluluk değil: çalışan deponun içinde
+  /// yürürken yanından geçtiği rafa uğramak isteyebilir.
+  int? _stepIndex;
+
+  /// Kullanıcının elle seçtiği kaynak raf. `null` ise satırın önerdiği raf.
+  String? _sourceLocationId;
+
   @override
   Widget build(BuildContext context) {
     final AsyncValue<OrderDetail?> detail = ref.watch(
@@ -73,19 +83,22 @@ class _PickingPageState extends ConsumerState<PickingPage> {
           title: 'Toplama görevi yok',
           message: 'Bu sipariş için henüz bir görev açılmamış.',
         ),
-        data: (OrderDetail? value) => _buildStep(value!.pickingTask!.id),
+        data: (OrderDetail? value) =>
+            _buildStep(value!.pickingTask!, value.pickingTask!.id),
       ),
     );
   }
 
-  Widget _buildStep(String taskId) {
-    final AsyncValue<PickingStep?> step = ref.watch(
-      pickingStepProvider(taskId),
+  Widget _buildStep(PickingTask task, String taskId) {
+    final PickingStepQuery query = PickingStepQuery(
+      taskId: taskId,
+      lineIndex: _stepIndex,
     );
+    final AsyncValue<PickingStep?> step = ref.watch(pickingStepProvider(query));
 
     return AsyncValueView<PickingStep?>(
       value: step,
-      onRetry: () => ref.invalidate(pickingStepProvider(taskId)),
+      onRetry: () => ref.invalidate(pickingStepProvider(query)),
       loading: const LoadingIndicator(message: 'Sıradaki ürün'),
       isEmpty: (PickingStep? value) => value == null,
       // Adım kalmadıysa görev bitmiştir (şartname 14: "Sipariş toplama
@@ -93,14 +106,55 @@ class _PickingPageState extends ConsumerState<PickingPage> {
       empty: _PickingComplete(orderId: widget.orderId),
       data: (PickingStep? value) => _StepView(
         step: value!,
+        // Tamamlanmış bir kaleme dönüldüğünde kalan sıfırdır; onay
+        // düğmesi de kapalı gelir, çalışan yalnızca ne aldığına bakar.
         quantity: _quantity ?? value.line.remainingQuantity,
+        sourceLocationId: _sourceLocationId ?? value.line.locationId,
         isSubmitting: _isSubmitting,
         isVerified: _verifiedProductId == value.product.id,
         onQuantityChanged: (int q) => setState(() => _quantity = q),
         onVerify: () => _verify(value),
+        onPickStep: () => _chooseStep(task, value),
+        onPickLocation: () => _chooseLocation(value),
         onConfirm: () => _confirm(taskId, value),
       ),
     );
+  }
+
+  /// Görevdeki kalemler arasında gezinme.
+  Future<void> _chooseStep(PickingTask task, PickingStep step) async {
+    final int? index = await PickingStepsSheet.show(
+      context: context,
+      task: task,
+      currentIndex: step.stepNumber - 1,
+    );
+    if (index == null || !mounted) return;
+
+    setState(() {
+      _stepIndex = index;
+      // Yeni kalemin kendi miktarı, kendi rafı, kendi doğrulaması olmalı.
+      _quantity = null;
+      _sourceLocationId = null;
+      _verifiedProductId = null;
+    });
+  }
+
+  /// Kaynak raf seçimi — ürün birden fazla rafta duruyorsa.
+  Future<void> _chooseLocation(PickingStep step) async {
+    final ProductStockSummary? summary = await ref.read(
+      productSummaryProvider(step.product.id).future,
+    );
+    if (summary == null || !mounted) return;
+
+    final String? locationId = await PickingLocationSheet.show(
+      context: context,
+      summary: summary,
+      selectedLocationId: _sourceLocationId ?? step.line.locationId,
+      quantity: _quantity ?? step.line.remainingQuantity,
+    );
+    if (locationId == null || !mounted) return;
+
+    setState(() => _sourceLocationId = locationId);
   }
 
   /// Barkod doğrulama paneli (şartname 14. bölüm).
@@ -129,12 +183,17 @@ class _PickingPageState extends ConsumerState<PickingPage> {
             taskId: taskId,
             productId: step.product.id,
             quantity: quantity,
+            locationId: _sourceLocationId,
           );
       if (!mounted) return;
 
-      // Sonraki adımın kendi varsayılan miktarı ve kendi doğrulaması olmalı.
+      // Elle seçilmiş adım bırakılır: onaydan sonra sıradaki tamamlanmamış
+      // kaleme dönülür. Sonraki adımın kendi miktarı, rafı ve doğrulaması
+      // olmalı.
       setState(() {
+        _stepIndex = null;
         _quantity = null;
+        _sourceLocationId = null;
         _verifiedProductId = null;
         _isSubmitting = false;
       });
@@ -152,29 +211,53 @@ class _PickingPageState extends ConsumerState<PickingPage> {
 }
 
 /// Şartnamenin toplama adımı ekranı.
-class _StepView extends StatelessWidget {
+class _StepView extends ConsumerWidget {
   const _StepView({
     required this.step,
     required this.quantity,
+    required this.sourceLocationId,
     required this.isSubmitting,
     required this.isVerified,
     required this.onQuantityChanged,
     required this.onVerify,
+    required this.onPickStep,
+    required this.onPickLocation,
     required this.onConfirm,
   });
 
   final PickingStep step;
   final int quantity;
+
+  /// Seçili kaynak raf — satırın önerdiğinden farklı olabilir.
+  final String sourceLocationId;
+
   final bool isSubmitting;
   final bool isVerified;
   final ValueChanged<int> onQuantityChanged;
   final VoidCallback onVerify;
+  final VoidCallback onPickStep;
+  final VoidCallback onPickLocation;
   final VoidCallback onConfirm;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final AppStatusColors status = Theme.of(context).status;
     final ColorScheme colors = Theme.of(context).colorScheme;
+
+    final ProductStockSummary? summary =
+        ref.watch(productSummaryProvider(step.product.id)).value;
+    final List<LocationStock> locations =
+        summary?.locations ?? const <LocationStock>[];
+
+    // Seçili rafın kodu ve oradaki stok; kullanıcı raf değiştirdiğinde
+    // "Rafta" sayısı da onunla değişmeli.
+    final LocationStock? source = locations
+        .where((LocationStock l) => l.location.id == sourceLocationId)
+        .firstOrNull;
+    final String locationCode = source?.location.code ?? step.location.code;
+    final int availableHere = source?.quantity ?? step.availableStock;
+    final bool isMultiLocation = locations.length > 1;
+    final bool isDone = step.line.isCompleted;
 
     return Column(
       children: <Widget>[
@@ -199,16 +282,42 @@ class _StepView extends StatelessWidget {
                           ?.copyWith(color: status.neutral),
                     ),
                   ),
-                  Text(
-                    '${step.stepNumber} / ${step.totalSteps}',
-                    style: Theme.of(context).textTheme.titleSmall
-                        ?.copyWith(color: colors.primary),
+                  // Adım göstergesi bir düğme: çalışan istediği kaleme
+                  // atlayabilmeli, sıra bir öneridir.
+                  InkWell(
+                    onTap: onPickStep,
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.sm,
+                        vertical: 2,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Text(
+                            '${step.stepNumber} / ${step.totalSteps}',
+                            style: Theme.of(context).textTheme.titleSmall
+                                ?.copyWith(color: colors.primary),
+                          ),
+                          const SizedBox(width: 3),
+                          Icon(
+                            AppIcons.expand,
+                            size: AppSizes.iconSm,
+                            color: colors.primary,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: AppSpacing.sm),
+              // İlerleme adım numarasını değil **toplanan kalem sayısını**
+              // gösterir: çalışan kalemler arasında gezinebildiği için bu
+              // ikisi artık aynı şey değil.
               TaskProgressBar(
-                completed: step.stepNumber - 1,
+                completed: step.task.completedLineCount,
                 total: step.totalSteps,
                 showCount: false,
               ),
@@ -216,9 +325,29 @@ class _StepView extends StatelessWidget {
               const SizedBox(height: AppSpacing.xl),
 
               // --- Gidilecek raf: ekranın en büyük öğesi ---
-              Text(
-                'GİT VE AL',
-                style: AppTypography.overline.copyWith(color: status.neutral),
+              Row(
+                children: <Widget>[
+                  Text(
+                    'GİT VE AL',
+                    style: AppTypography.overline
+                        .copyWith(color: status.neutral),
+                  ),
+                  const Spacer(),
+                  // Ürün birden fazla raftaysa çalışan hangisinden aldığını
+                  // seçebilmeli: önerilen raf kapalı, dolu ya da uzakta
+                  // olabilir.
+                  if (isMultiLocation)
+                    TextButton(
+                      onPressed: onPickLocation,
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.sm,
+                        ),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                      child: Text('Başka raf (${locations.length})'),
+                    ),
+                ],
               ),
               const SizedBox(height: AppSpacing.sm),
               Row(
@@ -232,7 +361,7 @@ class _StepView extends StatelessWidget {
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Text(
-                      step.location.code,
+                      locationCode,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: AppTypography.code.copyWith(
@@ -286,9 +415,11 @@ class _StepView extends StatelessWidget {
                   ),
                   StatBlock(
                     label: 'Rafta',
-                    value: Formatters.integer.format(step.availableStock),
+                    value: Formatters.integer.format(availableHere),
                     sublabel: step.product.unit,
-                    tone: step.hasEnoughStock ? null : StatusTone.danger,
+                    tone: availableHere >= step.line.remainingQuantity
+                        ? null
+                        : StatusTone.danger,
                   ),
                 ],
               ),
@@ -300,17 +431,25 @@ class _StepView extends StatelessWidget {
                 value: quantity,
                 min: 1,
                 // Rafta olandan ya da siparişte kalandan fazlası alınamaz.
-                max: step.availableStock < step.line.remainingQuantity
-                    ? step.availableStock
+                max: availableHere < step.line.remainingQuantity
+                    ? availableHere
                     : step.line.remainingQuantity,
+                enabled: !isDone,
                 unit: step.product.unit,
                 maxActionLabel: 'Tümü',
                 onChanged: onQuantityChanged,
               ),
 
-              if (!step.hasEnoughStock) ...<Widget>[
+              if (isDone) ...<Widget>[
                 const SizedBox(height: AppSpacing.md),
-                _ShortStockNotice(step: step),
+                _AlreadyPickedNotice(step: step),
+              ] else if (availableHere < step.line.remainingQuantity) ...[
+                const SizedBox(height: AppSpacing.md),
+                _ShortStockNotice(
+                  step: step,
+                  locationCode: locationCode,
+                  available: availableHere,
+                ),
               ],
             ],
           ),
@@ -320,7 +459,9 @@ class _StepView extends StatelessWidget {
             // Barkod doğrulama: depo çalışanı doğru ürünü aldığını
             // etiketi okutarak teyit eder (şartname 14. bölüm). Panel
             // açılır, sayfa değişmez — çalışan adımda kalır.
-            if (isVerified)
+            if (isDone)
+              const SizedBox.shrink()
+            else if (isVerified)
               BarcodeVerifiedBanner(product: step.product)
             else
               SecondaryButton(
@@ -328,12 +469,14 @@ class _StepView extends StatelessWidget {
                 icon: AppIcons.scan,
                 onPressed: onVerify,
               ),
-            const SizedBox(height: AppSpacing.sm),
+            if (!isDone) const SizedBox(height: AppSpacing.sm),
             PrimaryButton(
-              label: 'Toplamayı Onayla',
+              label: isDone ? 'Bu kalem toplandı' : 'Toplamayı Onayla',
               icon: AppIcons.confirm,
               isLoading: isSubmitting,
-              onPressed: isSubmitting || quantity <= 0 ? null : onConfirm,
+              onPressed: isSubmitting || isDone || quantity <= 0
+                  ? null
+                  : onConfirm,
             ),
           ],
         ),
@@ -347,9 +490,15 @@ class _StepView extends StatelessWidget {
 /// Toplama engellenmez: çalışan bulduğu kadarını alır, kalan eksik olarak
 /// kayda geçer. Depoda beklemek bir seçenek değildir.
 class _ShortStockNotice extends StatelessWidget {
-  const _ShortStockNotice({required this.step});
+  const _ShortStockNotice({
+    required this.step,
+    required this.locationCode,
+    required this.available,
+  });
 
   final PickingStep step;
+  final String locationCode;
+  final int available;
 
   @override
   Widget build(BuildContext context) {
@@ -372,11 +521,56 @@ class _ShortStockNotice extends StatelessWidget {
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
-              '${step.location.code} rafında ${step.availableStock} adet var, '
+              '$locationCode rafında $available adet var, '
               '${step.line.remainingQuantity} gerekiyor. '
               'Bulduğunuz kadarını alın.',
               style: Theme.of(context).textTheme.bodySmall
                   ?.copyWith(color: status.danger, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Tamamlanmış bir kaleme gidildiğinde gösterilen bilgi.
+///
+/// Çalışan ne aldığını gözden geçirmek için geri dönebilmeli; o adımda
+/// onay düğmesi kapalı olur.
+class _AlreadyPickedNotice extends StatelessWidget {
+  const _AlreadyPickedNotice({required this.step});
+
+  final PickingStep step;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppStatusColors status = Theme.of(context).status;
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: status.successContainer,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Icon(
+            AppIcons.confirm,
+            size: AppSizes.iconSm,
+            color: status.success,
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Text(
+              'Bu kalem toplandı: ${step.line.pickedQuantity} '
+              '${step.product.unit}. Başka bir kaleme geçmek için '
+              'üstteki adım sayısına dokunun.',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: status.success,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],

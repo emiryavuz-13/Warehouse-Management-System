@@ -65,15 +65,40 @@ final orderDetailProvider = FutureProvider.family<OrderDetail?, String>((
   return ref.watch(orderRepositoryProvider).getOrderDetail(orderId);
 });
 
-/// Toplama görevinin sıradaki adımı (şartname 14. bölüm).
+/// Toplama görevinin bir adımı (şartname 14. bölüm).
+///
+/// [PickingStepQuery.lineIndex] boşsa sıradaki (ilk tamamlanmamış) satır
+/// gelir. Doluysa o satır gelir; çalışan adımlar arasında gezinebilmeli.
 ///
 /// Görev tamamlandığında `null` döner; ekran bunu "toplama bitti" olarak
 /// yorumlar. Adım numarası ve toplam adım sayısı da bu nesnede gelir,
 /// böylece ekranın kendi sayacı olmaz ve iki kaynak birbirinden ayrışmaz.
-final pickingStepProvider = FutureProvider.family<PickingStep?, String>((
-  Ref ref,
-  String taskId,
-) {
-  ref.watch(dataRevisionProvider);
-  return ref.watch(orderRepositoryProvider).getCurrentPickingStep(taskId);
-});
+final pickingStepProvider =
+    FutureProvider.family<PickingStep?, PickingStepQuery>((
+      Ref ref,
+      PickingStepQuery query,
+    ) {
+      ref.watch(dataRevisionProvider);
+      return ref
+          .watch(orderRepositoryProvider)
+          .getPickingStep(query.taskId, lineIndex: query.lineIndex);
+    });
+
+/// [pickingStepProvider] için birleşik anahtar.
+class PickingStepQuery {
+  const PickingStepQuery({required this.taskId, this.lineIndex});
+
+  final String taskId;
+
+  /// `null` ise sıradaki satır.
+  final int? lineIndex;
+
+  @override
+  bool operator ==(Object other) =>
+      other is PickingStepQuery &&
+      other.taskId == taskId &&
+      other.lineIndex == lineIndex;
+
+  @override
+  int get hashCode => Object.hash(taskId, lineIndex);
+}

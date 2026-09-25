@@ -71,7 +71,13 @@ abstract interface class OrderRepository {
   });
 
   /// Toplama görevinin sıradaki adımı. Görev bittiyse `null`.
-  Future<PickingStep?> getCurrentPickingStep(String taskId);
+  /// Toplama görevinin bir adımı.
+  ///
+  /// [lineIndex] verilmezse sıradaki (ilk tamamlanmamış) satır döner.
+  /// Verilirse o satır döner — çalışan adımlar arasında gezinebilmeli;
+  /// deponun içinde yürürken sıradaki rafa değil, yanından geçtiği rafa
+  /// uğramak isteyebilir.
+  Future<PickingStep?> getPickingStep(String taskId, {int? lineIndex});
 
   /// Bir satırdan ürün toplar: stok düşer, hareket oluşur, sipariş ilerler.
   Future<PickingTask> pickLine({
@@ -79,6 +85,7 @@ abstract interface class OrderRepository {
     required String productId,
     required int quantity,
     required String userId,
+    String? locationId,
   });
 
   // --- Mal kabul (şartname 11-12. bölümler) ---
@@ -205,9 +212,9 @@ class MockOrderRepository implements OrderRepository {
   }
 
   @override
-  Future<PickingStep?> getCurrentPickingStep(String taskId) async {
+  Future<PickingStep?> getPickingStep(String taskId, {int? lineIndex}) async {
     await _config.beforeRead();
-    return _buildPickingStep(taskId);
+    return _buildPickingStep(taskId, lineIndex: lineIndex);
   }
 
   @override
@@ -216,6 +223,7 @@ class MockOrderRepository implements OrderRepository {
     required String productId,
     required int quantity,
     required String userId,
+    String? locationId,
   }) async {
     await _config.beforeWrite();
     return _db.pickLine(
@@ -223,6 +231,7 @@ class MockOrderRepository implements OrderRepository {
       productId: productId,
       quantity: quantity,
       userId: userId,
+      locationId: locationId,
     );
   }
 
@@ -381,12 +390,12 @@ class MockOrderRepository implements OrderRepository {
     return lines;
   }
 
-  PickingStep? _buildPickingStep(String taskId) {
+  PickingStep? _buildPickingStep(String taskId, {int? lineIndex}) {
     final PickingTask? task = _db.pickingTaskById(taskId);
     if (task == null) return null;
 
-    final int index = task.currentLineIndex;
-    if (index == -1) return null;
+    final int index = lineIndex ?? task.currentLineIndex;
+    if (index < 0 || index >= task.lines.length) return null;
 
     final PickingLine line = task.lines[index];
     final Product? product = _db.productById(line.productId);

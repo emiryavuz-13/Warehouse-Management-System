@@ -104,6 +104,7 @@ class WarehouseActions {
     required String taskId,
     required String productId,
     required int quantity,
+    String? locationId,
   }) async {
     final PickingTask task = await _ref
         .read(orderRepositoryProvider)
@@ -112,6 +113,7 @@ class WarehouseActions {
           productId: productId,
           quantity: quantity,
           userId: _userId,
+          locationId: locationId,
         );
     _bump();
     return task;

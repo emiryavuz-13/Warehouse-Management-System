@@ -457,13 +457,20 @@ class WarehouseDatabase {
   /// Kurallar:
   /// - Miktar sıfırdan büyük olmalı
   /// - Toplanan miktar siparişte istenen miktarı aşamaz
-  /// - Ürün satırda belirtilen lokasyondan alınır ve orada yeterli stok olmalı
+  /// - Ürün seçilen lokasyondan alınır ve orada yeterli stok olmalı
   /// - Tüm satırlar tamamlanmadan sipariş "Toplandı" durumuna geçmez
+  ///
+  /// [locationId] verilmezse satırın önerilen lokasyonu kullanılır. Aynı ürün
+  /// birden fazla rafta durabilir; görev açılırken en çok stoğun bulunduğu
+  /// raf önerilir ama çalışan başka bir raftan alabilir — önerilen raf
+  /// kapalı, dolu ya da uzakta olabilir. Seçilen raf satıra yazılır, böylece
+  /// kısmi toplamalarda ve sipariş detayında nereden alındığı görünür.
   PickingTask pickLine({
     required String taskId,
     required String productId,
     required int quantity,
     required String userId,
+    String? locationId,
   }) {
     final PickingTask task = _requireTask(taskId);
     final Product product = _requireProduct(productId);
@@ -489,8 +496,9 @@ class WarehouseDatabase {
       );
     }
 
-    final WarehouseLocation source = _requireLocation(line.locationId);
-    final int available = quantityAt(productId, line.locationId);
+    final String sourceId = locationId ?? line.locationId;
+    final WarehouseLocation source = _requireLocation(sourceId);
+    final int available = quantityAt(productId, sourceId);
     if (available < quantity) {
       throw WarehouseException.insufficientStock(
         productName: product.name,
@@ -501,7 +509,7 @@ class WarehouseDatabase {
     }
 
     // Stok rafından düşer (şartname 24 ve 38. bölümler).
-    _addQuantity(productId, line.locationId, -quantity);
+    _addQuantity(productId, sourceId, -quantity);
 
     final SalesOrder order = _requireOrder(task.orderId);
 
@@ -511,12 +519,13 @@ class WarehouseDatabase {
       type: MovementType.pick,
       userId: userId,
       reference: '#${order.orderNumber}',
-      sourceLocationId: line.locationId,
+      sourceLocationId: sourceId,
     );
 
     final List<PickingLine> lines = List<PickingLine>.of(task.lines);
     lines[lineIndex] = line.copyWith(
       pickedQuantity: line.pickedQuantity + quantity,
+      locationId: sourceId,
     );
 
     final bool finished = lines.every((PickingLine l) => l.isCompleted);
