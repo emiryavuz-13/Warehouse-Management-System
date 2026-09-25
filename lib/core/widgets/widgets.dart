@@ -17,6 +17,7 @@ export 'cards.dart';
 export 'dialogs.dart';
 export 'filter_sheet.dart';
 export 'info_widgets.dart';
+export 'istif_mark.dart';
 export 'list_entrance.dart';
 export 'location_breakdown.dart';
 export 'module_placeholder.dart';

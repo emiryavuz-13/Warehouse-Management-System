@@ -52,8 +52,7 @@ class _Body extends ConsumerWidget {
     final AppStatusColors status = Theme.of(context).status;
     final ColorScheme colors = Theme.of(context).colorScheme;
     final Warehouse? warehouse = ref.watch(currentWarehouseProvider).value;
-    final int unread =
-        ref.watch(unreadNotificationCountProvider).value ?? 0;
+    final int unread = ref.watch(unreadNotificationCountProvider).value ?? 0;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(
@@ -197,12 +196,18 @@ class _Body extends ConsumerWidget {
         const SizedBox(height: AppSpacing.lg),
 
         Center(
-          child: Text(
-            '${AppConstants.appName} · sürüm ${AppConstants.appVersion}\n'
-            'Demo sürümü — veriler cihazda tutulur, sunucuya gitmez.',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodySmall
-                ?.copyWith(color: status.neutral),
+          child: Column(
+            children: <Widget>[
+              const IstifLockup(markSize: 34),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                'Sürüm ${AppConstants.appVersion} · demo sürümü\n'
+                'Veriler cihazda tutulur, sunucuya gitmez.',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodySmall
+                    ?.copyWith(color: status.neutral),
+              ),
+            ],
           ),
         ),
       ],

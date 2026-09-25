@@ -1,4 +1,10 @@
-# Depo Yönetimi — Mobil WMS Demosu
+<p align="center">
+  <img src="docs/brand/istif-yatay.png" width="330" alt="İstif — Depo Yönetim Sistemi" />
+</p>
+
+# İstif — Mobil WMS Demosu
+
+*İstif*, deponun kendi sözcüğü: malı rafa düzenli biçimde yerleştirmek.
 
 Depo çalışanının elindeki mobil depo yönetim sistemi. Ürün arama, barkod
 okuma, mal kabul, raf yerleştirme, sipariş toplama, stok transferi, sayım ve

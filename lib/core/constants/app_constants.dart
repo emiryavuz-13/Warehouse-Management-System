@@ -3,8 +3,14 @@
 /// Şartname 32. bölüm: "Hardcoded tekrar eden değerler constants/theme
 /// içerisine alınmalı."
 abstract final class AppConstants {
-  /// Uygulama adı — AppBar ve profil ekranında gösterilir.
-  static const String appName = 'Depo Yönetimi';
+  /// Uygulama adı.
+  ///
+  /// *İstif* deponun kendi sözcüğü: malı rafa düzenli biçimde yerleştirmek.
+  /// Marka işareti için [IstifMark].
+  static const String appName = 'İstif';
+
+  /// Adın altında duran açıklama — açılış ve profil ekranında.
+  static const String appTagline = 'Depo Yönetim Sistemi';
 
   /// Uygulama sürümü — profil ekranının alt bilgisi.
   static const String appVersion = '1.0.0';

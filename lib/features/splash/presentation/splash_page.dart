@@ -6,8 +6,8 @@ import '../../../app/providers/providers.dart';
 import '../../../app/routes.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_spacing.dart';
-import '../../../app/theme/status_tone_colors.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/widgets/widgets.dart';
 
 /// Açılış ekranı (şartname 28. bölüm, 1. ekran).
 ///
@@ -59,7 +59,6 @@ class _SplashPageState extends ConsumerState<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colors = Theme.of(context).colorScheme;
     final AppStatusColors status = Theme.of(context).status;
 
     return Scaffold(
@@ -67,19 +66,9 @@ class _SplashPageState extends ConsumerState<SplashPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Container(
-              width: 88,
-              height: 88,
-              decoration: BoxDecoration(
-                color: colors.primary,
-                borderRadius: BorderRadius.circular(AppRadius.xl),
-              ),
-              child: Icon(
-                AppIcons.locations,
-                size: 44,
-                color: colors.onPrimary,
-              ),
-            ),
+            // Marka işareti yalnızca burada ve profilde görünür;
+            // operasyonel ekranlarda logo yoktur.
+            const IstifMark(size: 84),
             const SizedBox(height: AppSpacing.xl),
             Text(
               AppConstants.appName,
@@ -87,7 +76,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
-              'Depo Yönetim Sistemi',
+              AppConstants.appTagline,
               style: Theme.of(context).textTheme.bodyMedium
                   ?.copyWith(color: status.neutral),
             ),

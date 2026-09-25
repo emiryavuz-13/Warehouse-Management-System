@@ -30,8 +30,9 @@ void main() {
     await tester.pumpWidget(buildApp());
     await tester.pump();
 
-    expect(find.text('Depo Yönetimi'), findsOneWidget);
+    expect(find.text('İstif'), findsOneWidget);
     expect(find.text('Depo Yönetim Sistemi'), findsOneWidget);
+    expect(find.byType(IstifMark), findsOneWidget);
 
     final MaterialApp app = tester.widget<MaterialApp>(
       find.byType(MaterialApp),
