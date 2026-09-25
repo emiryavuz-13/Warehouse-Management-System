@@ -41,17 +41,11 @@ class ReceiptDetailPage extends ConsumerWidget {
     );
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(detail.value?.receipt.code ?? 'Mal Kabul'),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(AppIcons.scan),
-            tooltip: 'Barkod tara',
-            onPressed: () => context.go(AppRoutes.scan),
-          ),
-          const SizedBox(width: AppSpacing.xs),
-        ],
-      ),
+      // Başlıkta tarama kısayolu yok: şartname 27. bölüm barkod
+      // doğrulamayı yerleştirme adımına koyuyor ("50 adet iPhone → Barkod
+      // doğrula → A-01-01"). Buradaki bir tarama düğmesi kullanıcıyı Tara
+      // sekmesine atıp kaydı kaybettiriyordu.
+      appBar: AppBar(title: Text(detail.value?.receipt.code ?? 'Mal Kabul')),
       body: AsyncValueView<ReceiptDetail?>(
         value: detail,
         onRetry: () => ref.invalidate(receiptDetailProvider(receiptId)),

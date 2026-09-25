@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/providers/providers.dart';
-import '../../../app/routes.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../app/theme/app_typography.dart';
@@ -13,6 +12,7 @@ import '../../../core/widgets/widgets.dart';
 import '../../../data/views.dart';
 import '../../../data/warehouse_exception.dart';
 import '../../../models/models.dart';
+import '../../scan/presentation/widgets/barcode_verify_sheet.dart';
 import '../../shipments/presentation/widgets/ship_action.dart';
 import '../providers/order_providers.dart';
 
@@ -44,6 +44,12 @@ class PickingPage extends ConsumerStatefulWidget {
 class _PickingPageState extends ConsumerState<PickingPage> {
   int? _quantity;
   bool _isSubmitting = false;
+
+  /// Bu adımda barkodu okutulup doğrulanan ürün.
+  ///
+  /// Adım numarası değil ürün kimliği tutuluyor: sonraki adıma geçildiğinde
+  /// doğrulama kendiliğinden düşsün, çalışan her ürünü ayrı okutsun.
+  String? _verifiedProductId;
 
   @override
   Widget build(BuildContext context) {
@@ -89,10 +95,27 @@ class _PickingPageState extends ConsumerState<PickingPage> {
         step: value!,
         quantity: _quantity ?? value.line.remainingQuantity,
         isSubmitting: _isSubmitting,
+        isVerified: _verifiedProductId == value.product.id,
         onQuantityChanged: (int q) => setState(() => _quantity = q),
+        onVerify: () => _verify(value),
         onConfirm: () => _confirm(taskId, value),
       ),
     );
+  }
+
+  /// Barkod doğrulama paneli (şartname 14. bölüm).
+  ///
+  /// Doğrulama zorunlu değil: çalışan okutmadan da onaylayabilir, depoda
+  /// kamera bozuk olabilir ve iş durmamalı. Okuttuysa yanlış ürünü almasına
+  /// izin verilmez — panel eşleşmeden kapanmaz.
+  Future<void> _verify(PickingStep step) async {
+    final bool? verified = await BarcodeVerifySheet.show(
+      context: context,
+      expected: step.product,
+    );
+    if (verified != true || !mounted) return;
+
+    setState(() => _verifiedProductId = step.product.id);
   }
 
   Future<void> _confirm(String taskId, PickingStep step) async {
@@ -109,9 +132,10 @@ class _PickingPageState extends ConsumerState<PickingPage> {
           );
       if (!mounted) return;
 
-      // Sonraki adımın kendi varsayılan miktarı olmalı.
+      // Sonraki adımın kendi varsayılan miktarı ve kendi doğrulaması olmalı.
       setState(() {
         _quantity = null;
+        _verifiedProductId = null;
         _isSubmitting = false;
       });
     } on WarehouseException catch (error) {
@@ -133,14 +157,18 @@ class _StepView extends StatelessWidget {
     required this.step,
     required this.quantity,
     required this.isSubmitting,
+    required this.isVerified,
     required this.onQuantityChanged,
+    required this.onVerify,
     required this.onConfirm,
   });
 
   final PickingStep step;
   final int quantity;
   final bool isSubmitting;
+  final bool isVerified;
   final ValueChanged<int> onQuantityChanged;
+  final VoidCallback onVerify;
   final VoidCallback onConfirm;
 
   @override
@@ -290,12 +318,16 @@ class _StepView extends StatelessWidget {
         BottomActionBar(
           children: <Widget>[
             // Barkod doğrulama: depo çalışanı doğru ürünü aldığını
-            // etiketi okutarak teyit eder (şartname 14. bölüm).
-            SecondaryButton(
-              label: 'Barkod Tara',
-              icon: AppIcons.scan,
-              onPressed: () => context.go(AppRoutes.scan),
-            ),
+            // etiketi okutarak teyit eder (şartname 14. bölüm). Panel
+            // açılır, sayfa değişmez — çalışan adımda kalır.
+            if (isVerified)
+              BarcodeVerifiedBanner(product: step.product)
+            else
+              SecondaryButton(
+                label: 'Barkod Doğrula',
+                icon: AppIcons.scan,
+                onPressed: onVerify,
+              ),
             const SizedBox(height: AppSpacing.sm),
             PrimaryButton(
               label: 'Toplamayı Onayla',

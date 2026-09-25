@@ -12,6 +12,7 @@ import '../../../core/widgets/widgets.dart';
 import '../../../data/views.dart';
 import '../../../data/warehouse_exception.dart';
 import '../../../models/models.dart';
+import '../../scan/presentation/widgets/barcode_verify_sheet.dart';
 import '../providers/receiving_providers.dart';
 
 /// Ürün yerleştirme (şartname 11-12. bölümler).
@@ -47,6 +48,10 @@ class _PutawayPageState extends ConsumerState<PutawayPage> {
   int? _quantity;
   String? _locationId;
   bool _isSubmitting = false;
+
+  /// Barkodu okutulup doğrulanan ürün (şartname 27. bölüm, Demo 2:
+  /// "50 adet iPhone → Barkod doğrula → A-01-01 lokasyonu").
+  bool _isVerified = false;
 
   @override
   Widget build(BuildContext context) {
@@ -120,6 +125,17 @@ class _PutawayPageState extends ConsumerState<PutawayPage> {
 
     return BottomActionBar(
       children: <Widget>[
+        // Gelen kolinin etiketi okutularak doğru ürün olduğu teyit edilir.
+        // Zorunlu değil; kamera bozuk olabilir ve mal kapıda bekletilemez.
+        if (_isVerified)
+          BarcodeVerifiedBanner(product: line.product)
+        else
+          SecondaryButton(
+            label: 'Barkod Doğrula',
+            icon: AppIcons.scan,
+            onPressed: () => _verify(line.product),
+          ),
+        const SizedBox(height: AppSpacing.sm),
         PrimaryButton(
           label: 'Yerleştir',
           icon: AppIcons.putaway,
@@ -130,6 +146,16 @@ class _PutawayPageState extends ConsumerState<PutawayPage> {
         ),
       ],
     );
+  }
+
+  Future<void> _verify(Product product) async {
+    final bool? verified = await BarcodeVerifySheet.show(
+      context: context,
+      expected: product,
+    );
+    if (verified != true || !mounted) return;
+
+    setState(() => _isVerified = true);
   }
 
   /// Varsayılan miktar kalan adettir: depoda en sık yapılan iş, gelen malın

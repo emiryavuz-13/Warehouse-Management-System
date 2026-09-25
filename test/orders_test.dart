@@ -251,8 +251,9 @@ void main() {
         find.widgetWithText(PrimaryButton, 'Toplamayı Onayla'),
         findsOneWidget,
       );
+      // Düğme artık Tara sekmesine gitmiyor, doğrulama paneli açıyor.
       expect(
-        find.widgetWithText(SecondaryButton, 'Barkod Tara'),
+        find.widgetWithText(SecondaryButton, 'Barkod Doğrula'),
         findsOneWidget,
       );
     });
