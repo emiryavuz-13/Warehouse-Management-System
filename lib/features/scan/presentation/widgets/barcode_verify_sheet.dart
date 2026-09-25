@@ -42,18 +42,14 @@ class BarcodeVerifySheet extends ConsumerStatefulWidget {
     required BuildContext context,
     required Product expected,
   }) {
-    return showModalBottomSheet<bool>(
+    return showAppSheet<bool>(
       context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (BuildContext context) =>
-          BarcodeVerifySheet(expected: expected),
+      builder: (BuildContext context) => BarcodeVerifySheet(expected: expected),
     );
   }
 
   @override
-  ConsumerState<BarcodeVerifySheet> createState() =>
-      _BarcodeVerifySheetState();
+  ConsumerState<BarcodeVerifySheet> createState() => _BarcodeVerifySheetState();
 }
 
 class _BarcodeVerifySheetState extends ConsumerState<BarcodeVerifySheet> {
@@ -135,10 +131,7 @@ class _BarcodeVerifySheetState extends ConsumerState<BarcodeVerifySheet> {
 
                 if (_mismatch != null) ...<Widget>[
                   const SizedBox(height: AppSpacing.md),
-                  _MismatchNotice(
-                    result: _mismatch!,
-                    expected: expected,
-                  ),
+                  _MismatchNotice(result: _mismatch!, expected: expected),
                 ],
               ],
             ),
@@ -159,7 +152,9 @@ class _BarcodeVerifySheetState extends ConsumerState<BarcodeVerifySheet> {
             ),
 
           Divider(height: 1, color: status.border),
-          Flexible(child: _DemoList(expected: expected, onSelected: _check)),
+          Flexible(
+            child: _DemoList(expected: expected, onSelected: _check),
+          ),
 
           BottomActionBar(
             children: <Widget>[
@@ -277,8 +272,7 @@ class _DemoList extends ConsumerWidget {
         isExpected: true,
       ),
       for (final ScanResult result in demo)
-        if (result.summary != null &&
-            result.summary!.product.id != expected.id)
+        if (result.summary != null && result.summary!.product.id != expected.id)
           _DemoEntry(
             barcode: result.barcode,
             name: result.summary!.product.name,
@@ -305,7 +299,10 @@ class _DemoList extends ConsumerWidget {
         for (int i = 0; i < entries.length; i++) ...<Widget>[
           if (i > 0)
             Divider(height: 1, indent: AppSpacing.lg, color: status.border),
-          _DemoRow(entry: entries[i], onTap: () => onSelected(entries[i].barcode)),
+          _DemoRow(
+            entry: entries[i],
+            onTap: () => onSelected(entries[i].barcode),
+          ),
         ],
       ],
     );

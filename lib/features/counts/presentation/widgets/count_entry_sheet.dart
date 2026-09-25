@@ -46,10 +46,8 @@ class CountEntrySheet extends StatefulWidget {
     required CountLineDetail line,
     required String locationCode,
   }) {
-    return showModalBottomSheet<int>(
+    return showAppSheet<int>(
       context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
       builder: (BuildContext context) =>
           CountEntrySheet(line: line, locationCode: locationCode),
     );
@@ -70,125 +68,119 @@ class _CountEntrySheetState extends State<CountEntrySheet> {
     final InventoryCountLine data = widget.line.line;
     final int difference = _counted - data.systemQuantity;
 
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.viewInsetsOf(context).bottom,
-      ),
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.lg,
-            0,
-            AppSpacing.lg,
-            AppSpacing.lg,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Text(
-                      product.name,
-                      style: Theme.of(context).textTheme.titleMedium,
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          0,
+          AppSpacing.lg,
+          AppSpacing.lg,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    product.name,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                CodeChip(code: widget.locationCode),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            CodeChip(code: product.sku),
+
+            const SizedBox(height: AppSpacing.xl),
+
+            // Şartnamenin üç satırı: sistem · fiziksel · fark.
+            StatRow(
+              blocks: <Widget>[
+                StatBlock(
+                  label: 'Sistem stoku',
+                  value: Formatters.integer.format(data.systemQuantity),
+                  sublabel: product.unit,
+                ),
+                StatBlock(
+                  label: 'Fiziksel',
+                  value: Formatters.integer.format(_counted),
+                  sublabel: product.unit,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      'FARK',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: status.neutral,
+                        letterSpacing: 0.8,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  CodeChip(code: widget.locationCode),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              CodeChip(code: product.sku),
-
-              const SizedBox(height: AppSpacing.xl),
-
-              // Şartnamenin üç satırı: sistem · fiziksel · fark.
-              StatRow(
-                blocks: <Widget>[
-                  StatBlock(
-                    label: 'Sistem stoku',
-                    value: Formatters.integer.format(data.systemQuantity),
-                    sublabel: product.unit,
-                  ),
-                  StatBlock(
-                    label: 'Fiziksel',
-                    value: Formatters.integer.format(_counted),
-                    sublabel: product.unit,
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Text(
-                        'FARK',
-                        style: Theme.of(context).textTheme.labelSmall
-                            ?.copyWith(
-                              color: status.neutral,
-                              letterSpacing: 0.8,
-                              fontWeight: FontWeight.w700,
-                            ),
-                      ),
-                      const SizedBox(height: AppSpacing.xs + 2),
-                      DifferenceLabel(value: difference),
-                      const SizedBox(height: 2),
-                      Text(
-                        difference == 0
-                            ? 'eşleşti'
-                            : (difference < 0 ? 'eksik' : 'fazla'),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.bodySmall
-                            ?.copyWith(color: status.neutral),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: AppSpacing.xl),
-
-              QuantitySelector(
-                label: 'Raftaki fiziksel miktar',
-                value: _counted,
-                // Sıfır geçerli bir sayım sonucudur: raf boş çıkmış olabilir.
-                min: 0,
-                unit: product.unit,
-                showMaxAction: false,
-                onChanged: (int value) => setState(() => _counted = value),
-              ),
-
-              if (difference != 0) ...<Widget>[
-                const SizedBox(height: AppSpacing.md),
-                _DifferenceNotice(
-                  difference: difference,
-                  systemQuantity: data.systemQuantity,
-                  counted: _counted,
-                  unit: product.unit,
+                    const SizedBox(height: AppSpacing.xs + 2),
+                    DifferenceLabel(value: difference),
+                    const SizedBox(height: 2),
+                    Text(
+                      difference == 0
+                          ? 'eşleşti'
+                          : (difference < 0 ? 'eksik' : 'fazla'),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodySmall
+                          ?.copyWith(color: status.neutral),
+                    ),
+                  ],
                 ),
               ],
+            ),
 
-              const SizedBox(height: AppSpacing.xl),
+            const SizedBox(height: AppSpacing.xl),
 
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: SecondaryButton(
-                      label: 'Vazgeç',
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: PrimaryButton(
-                      label: 'Sayımı Kaydet',
-                      onPressed: () => Navigator.of(context).pop(_counted),
-                    ),
-                  ),
-                ],
+            QuantitySelector(
+              label: 'Raftaki fiziksel miktar',
+              value: _counted,
+              // Sıfır geçerli bir sayım sonucudur: raf boş çıkmış olabilir.
+              min: 0,
+              unit: product.unit,
+              showMaxAction: false,
+              onChanged: (int value) => setState(() => _counted = value),
+            ),
+
+            if (difference != 0) ...<Widget>[
+              const SizedBox(height: AppSpacing.md),
+              _DifferenceNotice(
+                difference: difference,
+                systemQuantity: data.systemQuantity,
+                counted: _counted,
+                unit: product.unit,
               ),
             ],
-          ),
+
+            const SizedBox(height: AppSpacing.xl),
+
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: SecondaryButton(
+                    label: 'Vazgeç',
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: PrimaryButton(
+                    label: 'Sayımı Kaydet',
+                    onPressed: () => Navigator.of(context).pop(_counted),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

@@ -19,10 +19,8 @@ class ProductPickerSheet extends ConsumerStatefulWidget {
 
   /// Paneli açar; seçilen ürünün özetini döner.
   static Future<ProductStockSummary?> show(BuildContext context) {
-    return showModalBottomSheet<ProductStockSummary>(
+    return showAppSheet<ProductStockSummary>(
       context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
       builder: (BuildContext context) => const ProductPickerSheet(),
     );
   }

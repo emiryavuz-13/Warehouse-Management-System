@@ -12,6 +12,7 @@ library;
 export 'app_buttons.dart';
 export 'app_card.dart';
 export 'app_search_bar.dart';
+export 'app_sheet.dart';
 export 'async_value_view.dart';
 export 'cards.dart';
 export 'dialogs.dart';

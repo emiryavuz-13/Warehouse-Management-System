@@ -5,6 +5,7 @@ import '../../app/theme/app_spacing.dart';
 import '../../app/theme/status_tone_colors.dart';
 import '../../models/enums.dart';
 import 'app_buttons.dart';
+import 'app_sheet.dart';
 
 /// Filtre panelinin iskeleti (şartname 29. bölüm).
 ///
@@ -36,12 +37,7 @@ class FilterSheet extends StatelessWidget {
     required BuildContext context,
     required WidgetBuilder builder,
   }) {
-    return showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: builder,
-    );
+    return showAppSheet<void>(context: context, builder: builder);
   }
 
   @override

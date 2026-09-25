@@ -41,10 +41,8 @@ class PickingStepsSheet extends ConsumerWidget {
     required PickingTask task,
     required int currentIndex,
   }) {
-    return showModalBottomSheet<int>(
+    return showAppSheet<int>(
       context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
       builder: (BuildContext context) =>
           PickingStepsSheet(task: task, currentIndex: currentIndex),
     );
@@ -92,8 +90,11 @@ class PickingStepsSheet extends ConsumerWidget {
               shrinkWrap: true,
               padding: const EdgeInsets.only(bottom: AppSpacing.lg),
               itemCount: task.lines.length,
-              separatorBuilder: (_, _) =>
-                  Divider(height: 1, indent: AppSpacing.lg, color: status.border),
+              separatorBuilder: (_, _) => Divider(
+                height: 1,
+                indent: AppSpacing.lg,
+                color: status.border,
+              ),
               itemBuilder: (BuildContext context, int index) => _StepRow(
                 line: task.lines[index],
                 index: index,
@@ -125,8 +126,9 @@ class _StepRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AppStatusColors status = Theme.of(context).status;
     final ColorScheme colors = Theme.of(context).colorScheme;
-    final ProductStockSummary? summary =
-        ref.watch(productSummaryProvider(line.productId)).value;
+    final ProductStockSummary? summary = ref
+        .watch(productSummaryProvider(line.productId))
+        .value;
     final String locationCode =
         ref
             .watch(locationsProvider)
@@ -162,11 +164,7 @@ class _StepRow extends ConsumerWidget {
                   shape: BoxShape.circle,
                 ),
                 child: isDone
-                    ? Icon(
-                        AppIcons.confirm,
-                        size: 15,
-                        color: status.success,
-                      )
+                    ? Icon(AppIcons.confirm, size: 15, color: status.success)
                     : Text(
                         '${index + 1}',
                         style: Theme.of(context).textTheme.bodySmall
@@ -243,10 +241,8 @@ class PickingLocationSheet extends ConsumerWidget {
     required String selectedLocationId,
     required int quantity,
   }) {
-    return showModalBottomSheet<String>(
+    return showAppSheet<String>(
       context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
       builder: (BuildContext context) => PickingLocationSheet(
         summary: summary,
         selectedLocationId: selectedLocationId,
@@ -299,8 +295,11 @@ class PickingLocationSheet extends ConsumerWidget {
               shrinkWrap: true,
               padding: const EdgeInsets.only(bottom: AppSpacing.lg),
               itemCount: summary.locations.length,
-              separatorBuilder: (_, _) =>
-                  Divider(height: 1, indent: AppSpacing.lg, color: status.border),
+              separatorBuilder: (_, _) => Divider(
+                height: 1,
+                indent: AppSpacing.lg,
+                color: status.border,
+              ),
               itemBuilder: (BuildContext context, int index) {
                 final LocationStock stock = summary.locations[index];
                 final bool fits = stock.quantity >= quantity;
