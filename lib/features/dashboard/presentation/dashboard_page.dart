@@ -77,6 +77,11 @@ class _MetricsSection extends ConsumerWidget {
     return Padding(
       padding: AppSpacing.screenPadding,
       child: AsyncValueView<DashboardSummary>(
+        // Dashboard'un her bölümü bir bölüm; hiçbiri "ekranın tamamı"
+        // değil. Üçü de tam boy hata gösterince aynı mesaj ekranda üst
+        // üste tekrarlanıyor ve çalışan kısımlar (hızlı işlemler) aşağıya
+        // itiliyordu.
+        compactError: true,
         value: summary,
         onRetry: () => ref.invalidate(dashboardSummaryProvider),
         loading: const LoadingState(child: _MetricsSkeleton()),
@@ -162,6 +167,7 @@ class _CriticalStockSection extends ConsumerWidget {
             padding: const EdgeInsets.only(bottom: AppSpacing.xs),
           ),
           AsyncValueView<List<ProductStockSummary>>(
+            compactError: true,
             value: products,
             onRetry: () => ref.invalidate(criticalProductsProvider),
             loading: const LoadingState(child: _ListSkeleton(rows: 3)),
@@ -201,6 +207,7 @@ class _RecentMovementsSection extends ConsumerWidget {
             padding: const EdgeInsets.only(bottom: AppSpacing.xs),
           ),
           AsyncValueView<List<MovementDetail>>(
+            compactError: true,
             value: movements,
             onRetry: () => ref.invalidate(recentMovementsProvider),
             loading: const LoadingState(child: _ListSkeleton(rows: 4)),

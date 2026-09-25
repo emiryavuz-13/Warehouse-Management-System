@@ -33,10 +33,11 @@ class DashboardHeader extends ConsumerWidget {
         .watch(unreadNotificationCountProvider)
         .maybeWhen(data: (int value) => value, orElse: () => 0);
 
-    final String name = user.maybeWhen(
-      data: (AppUser value) => value.firstName,
-      orElse: () => '',
-    );
+    // `maybeWhen(data:)` hata durumunda boş döner ama Riverpod önceki veriyi
+    // `value` içinde tutmaya devam eder. Hemen alttaki rol ve depo yazısı
+    // `value` okuduğu için, isim kaybolup rol kalıyordu — aynı kaynaktan
+    // okumak bu tutarsızlığı bitiriyor.
+    final String name = user.value?.firstName ?? '';
     final String subtitle = <String?>[
       user.value?.role.label,
       warehouse.value?.name,

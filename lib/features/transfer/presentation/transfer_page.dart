@@ -505,6 +505,7 @@ class _Body extends ConsumerWidget {
           const SizedBox(height: AppSpacing.sm)
         else
           AsyncValueView<List<TransferTarget>>(
+            compactError: true,
             value: targets,
             onRetry: () => ref.invalidate(
               targetLocationsProvider(

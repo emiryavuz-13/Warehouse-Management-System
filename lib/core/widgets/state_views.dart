@@ -140,10 +140,23 @@ class EmptyState extends StatelessWidget {
 /// teknik ayrıntı gösterilmez; kullanıcının yapabileceği tek şey yeniden
 /// denemektir.
 class ErrorState extends StatelessWidget {
-  const ErrorState({required this.error, this.onRetry, super.key});
+  const ErrorState({
+    required this.error,
+    this.onRetry,
+    this.compact = false,
+    super.key,
+  });
 
   final Object error;
   final VoidCallback? onRetry;
+
+  /// Ekranın tamamı değil, bir bölümü başarısız olduğunda kullanılır.
+  ///
+  /// Dashboard gibi birden çok bölümü olan ekranlarda her bölüm kendi
+  /// hatasını tam boy gösterirse aynı mesaj ekranda iki üç kez, kocaman
+  /// tekrarlanıyor ve sayfanın geri kalanı (çalışan kısımlar) görünmez
+  /// hale geliyordu. Kompakt hal tek satır + küçük bir "tekrar dene".
+  final bool compact;
 
   /// Hatanın kullanıcıya gösterilecek hali.
   static String describe(Object error) {
@@ -159,9 +172,49 @@ class ErrorState extends StatelessWidget {
         (error as WarehouseException).code ==
             WarehouseErrorCode.simulatedFailure;
 
+    final String title = isSimulated
+        ? 'Bağlantı kurulamadı'
+        : 'Bir şeyler ters gitti';
+
+    if (compact) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+        child: Row(
+          children: <Widget>[
+            Icon(
+              isSimulated ? AppIcons.offline : AppIcons.error,
+              size: AppSizes.iconMd,
+              color: status.danger,
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Text(
+                title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodySmall
+                    ?.copyWith(color: status.danger),
+              ),
+            ),
+            if (onRetry != null)
+              TextButton(
+                onPressed: onRetry,
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                  ),
+                  visualDensity: VisualDensity.compact,
+                ),
+                child: const Text('Tekrar dene'),
+              ),
+          ],
+        ),
+      );
+    }
+
     return _CenteredMessage(
       icon: isSimulated ? AppIcons.offline : AppIcons.error,
-      title: isSimulated ? 'Bağlantı kurulamadı' : 'Bir şeyler ters gitti',
+      title: title,
       message: describe(error),
       iconColor: status.danger,
       iconBackground: status.dangerContainer,

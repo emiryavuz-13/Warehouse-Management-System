@@ -401,6 +401,7 @@ class _Body extends ConsumerWidget {
           padding: const EdgeInsets.only(bottom: AppSpacing.sm),
         ),
         AsyncValueView<List<PutawayLocation>>(
+          compactError: true,
           value: locations,
           onRetry: () =>
               ref.invalidate(putawayLocationsProvider(product.id)),

@@ -221,6 +221,7 @@ class _ProductDetailBody extends ConsumerWidget {
             padding: const EdgeInsets.only(bottom: AppSpacing.xs),
           ),
           AsyncValueView<List<MovementDetail>>(
+            compactError: true,
             value: movements,
             onRetry: () => ref.invalidate(productMovementsProvider(product.id)),
             loading: const LoadingState(

@@ -25,6 +25,7 @@ class AsyncValueView<T> extends StatelessWidget {
     this.loading,
     this.isEmpty,
     this.empty,
+    this.compactError = false,
     super.key,
   });
 
@@ -50,6 +51,12 @@ class AsyncValueView<T> extends StatelessWidget {
   /// Boş durumda çizilecek içerik.
   final Widget? empty;
 
+  /// Ekranın tamamı değil bir bölümü ise hata tek satıra iner.
+  ///
+  /// Dashboard gibi çok bölümlü ekranlarda her bölümün tam boy hata
+  /// göstermesi aynı mesajı ekranda üst üste tekrarlıyordu.
+  final bool compactError;
+
   @override
   Widget build(BuildContext context) {
     return value.when(
@@ -61,7 +68,7 @@ class AsyncValueView<T> extends StatelessWidget {
       skipLoadingOnRefresh: true,
       data: _buildData,
       error: (Object error, StackTrace _) =>
-          ErrorState(error: error, onRetry: onRetry),
+          ErrorState(error: error, onRetry: onRetry, compact: compactError),
       loading: () => loading ?? const LoadingIndicator(),
     );
   }

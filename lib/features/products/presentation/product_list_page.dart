@@ -110,10 +110,13 @@ class ProductListPage extends ConsumerWidget {
                       Divider(height: 1, color: status.border),
                   itemBuilder: (BuildContext context, int index) {
                     final ProductStockSummary summary = items[index];
-                    return ProductCard(
-                      summary: summary,
-                      onTap: () => context.push(
-                        AppRoutes.productDetail(summary.product.id),
+                    return ListEntrance(
+                      index: index,
+                      child: ProductCard(
+                        summary: summary,
+                        onTap: () => context.push(
+                          AppRoutes.productDetail(summary.product.id),
+                        ),
                       ),
                     );
                   },

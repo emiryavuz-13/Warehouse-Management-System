@@ -129,7 +129,9 @@ class StockListPage extends ConsumerWidget {
                     final ProductStockSummary summary = items[index];
                     final String productId = summary.product.id;
 
-                    return StockRow(
+                    return ListEntrance(
+                      index: index,
+                      child: StockRow(
                       // Satır açık/kapalı durumu listeler arası karışmasın
                       // diye ürüne bağlanır; filtre değişince doğru satır
                       // açık kalır.
@@ -139,8 +141,9 @@ class StockListPage extends ConsumerWidget {
                           context.push(AppRoutes.productDetail(productId)),
                       onTransfer: () =>
                           context.push(AppRoutes.transferForProduct(productId)),
-                      onOpenLocation: (String locationId) =>
-                          context.push(AppRoutes.locationDetail(locationId)),
+                        onOpenLocation: (String locationId) =>
+                            context.push(AppRoutes.locationDetail(locationId)),
+                      ),
                     );
                   },
                 ),
@@ -176,6 +179,13 @@ class _StatusFilterStrip extends ConsumerWidget {
     );
 
     final int total = counts.values.fold(0, (int a, int b) => a + b);
+
+    // Veri gelmeden (ya da hata alınmışken) şerit çizilmez. Aksi halde
+    // hata ekranının üstünde "0 ürün · 0 kritik · 0 stok yok" duruyor ve
+    // bu, hatayı değil "depo boş" bilgisini anlatıyordu.
+    if (ref.watch(stockBaseProvider).value == null) {
+      return const SizedBox(height: AppSpacing.sm);
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),

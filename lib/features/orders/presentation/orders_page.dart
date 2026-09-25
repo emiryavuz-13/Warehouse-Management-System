@@ -111,12 +111,16 @@ class OrdersPage extends ConsumerWidget {
                   itemCount: items.length,
                   separatorBuilder: (_, _) =>
                       Divider(height: 1, color: status.border),
-                  itemBuilder: (BuildContext context, int index) => OrderCard(
-                    order: items[index],
-                    onTap: () => context.push(
-                      AppRoutes.orderDetail(items[index].id),
-                    ),
-                  ),
+                  itemBuilder: (BuildContext context, int index) =>
+                      ListEntrance(
+                        index: index,
+                        child: OrderCard(
+                          order: items[index],
+                          onTap: () => context.push(
+                            AppRoutes.orderDetail(items[index].id),
+                          ),
+                        ),
+                      ),
                 ),
               ),
             ),
