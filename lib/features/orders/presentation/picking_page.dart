@@ -34,9 +34,13 @@ import 'widgets/picking_sheets.dart';
 /// Her onayda (şartname 14. bölüm) stok azalır, hareket oluşur, sipariş
 /// durumu güncellenir ve kullanıcı sonraki ürüne ilerler.
 class PickingPage extends ConsumerStatefulWidget {
-  const PickingPage({required this.orderId, super.key});
+  const PickingPage({required this.orderId, this.initialLineIndex, super.key});
 
   final String orderId;
+
+  /// Ekranın açılacağı kalem. Sipariş detayındaki "Topla" düğmesi bunu
+  /// doldurur; boşsa sıradaki tamamlanmamış kalem gösterilir.
+  final int? initialLineIndex;
 
   @override
   ConsumerState<PickingPage> createState() => _PickingPageState();
@@ -45,6 +49,12 @@ class PickingPage extends ConsumerStatefulWidget {
 class _PickingPageState extends ConsumerState<PickingPage> {
   int? _quantity;
   bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _stepIndex = widget.initialLineIndex;
+  }
 
   /// Bu adımda barkodu okutulup doğrulanan ürün.
   ///
@@ -90,9 +100,15 @@ class _PickingPageState extends ConsumerState<PickingPage> {
   }
 
   Widget _buildStep(PickingTask task, String taskId) {
+    // Geçersiz bir sıra numarası (elle yazılmış adres) görevi tamamlanmış
+    // gibi göstermemeli; böyle bir durumda sıradaki kaleme düşülür.
+    final int? requested = _stepIndex;
     final PickingStepQuery query = PickingStepQuery(
       taskId: taskId,
-      lineIndex: _stepIndex,
+      lineIndex:
+          requested != null && requested >= 0 && requested < task.lines.length
+          ? requested
+          : null,
     );
     final AsyncValue<PickingStep?> step = ref.watch(pickingStepProvider(query));
 
@@ -244,8 +260,9 @@ class _StepView extends ConsumerWidget {
     final AppStatusColors status = Theme.of(context).status;
     final ColorScheme colors = Theme.of(context).colorScheme;
 
-    final ProductStockSummary? summary =
-        ref.watch(productSummaryProvider(step.product.id)).value;
+    final ProductStockSummary? summary = ref
+        .watch(productSummaryProvider(step.product.id))
+        .value;
     final List<LocationStock> locations =
         summary?.locations ?? const <LocationStock>[];
 
@@ -329,8 +346,9 @@ class _StepView extends ConsumerWidget {
                 children: <Widget>[
                   Text(
                     'GİT VE AL',
-                    style: AppTypography.overline
-                        .copyWith(color: status.neutral),
+                    style: AppTypography.overline.copyWith(
+                      color: status.neutral,
+                    ),
                   ),
                   const Spacer(),
                   // Ürün birden fazla raftaysa çalışan hangisinden aldığını
@@ -556,11 +574,7 @@ class _AlreadyPickedNotice extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Icon(
-            AppIcons.confirm,
-            size: AppSizes.iconSm,
-            color: status.success,
-          ),
+          Icon(AppIcons.confirm, size: AppSizes.iconSm, color: status.success),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(

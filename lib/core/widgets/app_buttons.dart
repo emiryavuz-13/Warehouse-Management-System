@@ -115,6 +115,58 @@ class SecondaryButton extends StatelessWidget {
   }
 }
 
+/// Liste satırının sonundaki eylem etiketi (şartname 29. bölüm).
+///
+/// Sağa bakan bir ok satırın tıklanabildiğini söyler ama **ne olacağını**
+/// söylemez. Operasyonel ekranlarda bu fark önemli: mal kabul satırına
+/// dokunmak yerleştirme ekranını açar, sipariş satırındaki düğme o kalemi
+/// toplamaya götürür. Telefonu eline yeni almış bir depo çalışanı bunu
+/// deneyerek değil okuyarak bilmeli.
+///
+/// Etiket satırın sağ sütununa, miktarın altına yerleşir. Yan yana
+/// dizilseydi dar ekranda ve büyük yazı tipinde ürün adını ezerdi; alt alta
+/// dizilince genişlik en uzun tek satır kadar olur.
+///
+/// [onPressed] boş bırakılırsa bileşen kendi dokunma alanını açmaz: satırın
+/// tamamı zaten tıklanabilir demektir, etiket yalnızca ne olacağını duyurur.
+class RowAction extends StatelessWidget {
+  const RowAction({required this.label, this.onPressed, super.key});
+
+  final String label;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color color = Theme.of(context).colorScheme.primary;
+
+    final Widget content = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodySmall
+              ?.copyWith(color: color, fontWeight: FontWeight.w700),
+        ),
+        const SizedBox(width: 2),
+        Icon(AppIcons.forward, size: AppSizes.iconSm, color: color),
+      ],
+    );
+
+    if (onPressed == null) return content;
+
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(AppRadius.pill),
+      child: Padding(
+        // Yatay dolgu yok: etiket sütunun sağ kenarında miktarla hizalı
+        // dursun. Dokunma alanını dikeyde açıyoruz.
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+        child: content,
+      ),
+    );
+  }
+}
+
 /// Ekranın altına sabitlenen eylem çubuğu.
 ///
 /// Operasyonel ekranlarda ("Transferi Başlat", "Toplamayı Onayla") onay

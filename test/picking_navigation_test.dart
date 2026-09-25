@@ -61,6 +61,128 @@ void main() {
     return container;
   }
 
+  Future<ProviderContainer> openOrder(
+    WidgetTester tester,
+    String orderId,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        retry: noRetryPolicy,
+        overrides: [
+          mockConfigProvider.overrideWithValue(MockConfig.instant()),
+          cameraSupportedProvider.overrideWithValue(false),
+        ],
+        child: const WarehouseApp(),
+      ),
+    );
+    await tester.pumpAndSettle(const Duration(seconds: 2));
+
+    final ProviderContainer container = ProviderScope.containerOf(
+      tester.element(find.byType(WarehouseApp)),
+    );
+    container.read(routerProvider).go('/orders/$orderId');
+    await tester.pumpAndSettle(const Duration(seconds: 2));
+
+    return container;
+  }
+
+  /// Sipariş detayındaki kalem satırlarında "Topla" kısayolu.
+  ///
+  /// Ekranın altındaki tek düğme ("Toplamaya Devam Et") çalışanı hep
+  /// sıradaki kaleme götürüyordu; satırların tıklanabildiğini söyleyen bir
+  /// şey yoktu.
+  group('Sipariş satırından toplama', () {
+    testWidgets('görev açıksa her toplanmamış kalemde "Topla" çıkar', (
+      WidgetTester tester,
+    ) async {
+      await openOrder(tester, 'ord-10452');
+
+      // Üç kalem de toplanmamış.
+      expect(find.text('Topla'), findsNWidgets(3));
+    });
+
+    testWidgets('görev açılmadan satır kısayolu olmaz', (
+      WidgetTester tester,
+    ) async {
+      // #10460 henüz "Yeni"; tek yol alttaki "Siparişi Topla" düğmesi.
+      await openOrder(tester, 'ord-10460');
+
+      expect(find.text('Siparişi Topla'), findsOneWidget);
+      expect(find.text('Topla'), findsNothing);
+    });
+
+    testWidgets('"Topla" doğrudan o kalemin adımını açar', (
+      WidgetTester tester,
+    ) async {
+      await openOrder(tester, 'ord-10452');
+
+      // Üçüncü kalem alttaki eylem çubuğunun arkasında kalıyor.
+      await tester.drag(find.byType(ListView).first, const Offset(0, -240));
+      await tester.pumpAndSettle();
+
+      // Üçüncü kalem: Logitech MX Master 3S.
+      await tester.tap(find.text('Topla').at(2));
+      await tester.pumpAndSettle();
+
+      expect(find.text('3 / 3'), findsOneWidget);
+      expect(find.textContaining('MX Master'), findsWidgets);
+      expect(find.text('C-01-01'), findsWidgets);
+    });
+
+    testWidgets('toplanmış kalemde kısayol kalmaz', (
+      WidgetTester tester,
+    ) async {
+      final ProviderContainer container = await openOrder(tester, 'ord-10452');
+
+      await tester.tap(find.text('Topla').first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(PrimaryButton, 'Toplamayı Onayla'));
+      await tester.pumpAndSettle();
+
+      // Toplama ekranından sipariş detayına dön.
+      container.read(routerProvider).go('/orders/ord-10452');
+      await tester.pumpAndSettle(const Duration(seconds: 2));
+
+      expect(find.text('toplandı'), findsOneWidget);
+      expect(find.text('Topla'), findsNWidgets(2));
+    });
+  });
+
+  group('Adres satırındaki kalem numarası', () {
+    testWidgets('geçersiz sıra numarası görevi bitmiş göstermez', (
+      WidgetTester tester,
+    ) async {
+      // Elle yazılmış bir adres ekranı "toplama tamamlandı" ekranına
+      // düşürmemeli; sıradaki kaleme dönmeli.
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          retry: noRetryPolicy,
+          overrides: [
+            mockConfigProvider.overrideWithValue(MockConfig.instant()),
+            cameraSupportedProvider.overrideWithValue(false),
+          ],
+          child: const WarehouseApp(),
+        ),
+      );
+      await tester.pumpAndSettle(const Duration(seconds: 2));
+
+      ProviderScope.containerOf(tester.element(find.byType(WarehouseApp)))
+          .read(routerProvider)
+          .go('/orders/ord-10452/picking?line=9');
+      await tester.pumpAndSettle(const Duration(seconds: 2));
+
+      expect(find.text('1 / 3'), findsOneWidget);
+    });
+  });
+
   group('Kalemler arası geçiş', () {
     testWidgets('adım göstergesi kalem listesini açar', (
       WidgetTester tester,
@@ -124,9 +246,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await tester.tap(
-        find.widgetWithText(PrimaryButton, 'Toplamayı Onayla'),
-      );
+      await tester.tap(find.widgetWithText(PrimaryButton, 'Toplamayı Onayla'));
       await tester.pumpAndSettle();
 
       // Elle seçim bırakılır, ilk tamamlanmamış kaleme dönülür.
@@ -147,9 +267,7 @@ void main() {
     ) async {
       await openPicking(tester);
 
-      await tester.tap(
-        find.widgetWithText(PrimaryButton, 'Toplamayı Onayla'),
-      );
+      await tester.tap(find.widgetWithText(PrimaryButton, 'Toplamayı Onayla'));
       await tester.pumpAndSettle();
 
       // Artık 2. kalemdeyiz; 1. kaleme geri dön.
@@ -261,10 +379,13 @@ void main() {
       ))!;
       // Önerilen raf dışında, 5 adede yeten bir raf seç.
       final LocationStock other = before.locations.firstWhere(
-        (LocationStock l) => l.location.id != line.locationId && l.quantity >= 5,
+        (LocationStock l) =>
+            l.location.id != line.locationId && l.quantity >= 5,
       );
 
-      await container.read(warehouseActionsProvider).pickLine(
+      await container
+          .read(warehouseActionsProvider)
+          .pickLine(
             taskId: task.id,
             productId: 'p-09',
             quantity: 5,
@@ -307,10 +428,13 @@ void main() {
         productSummaryProvider('p-09').future,
       ))!;
       final LocationStock other = summary.locations.firstWhere(
-        (LocationStock l) => l.location.id != line.locationId && l.quantity >= 5,
+        (LocationStock l) =>
+            l.location.id != line.locationId && l.quantity >= 5,
       );
 
-      await container.read(warehouseActionsProvider).pickLine(
+      await container
+          .read(warehouseActionsProvider)
+          .pickLine(
             taskId: task.id,
             productId: 'p-09',
             quantity: 5,
@@ -340,7 +464,9 @@ void main() {
       final LocationStock smallest = summary.locations.last;
 
       await expectLater(
-        container.read(warehouseActionsProvider).pickLine(
+        container
+            .read(warehouseActionsProvider)
+            .pickLine(
               taskId: task.id,
               productId: 'p-09',
               quantity: smallest.quantity + 1,
@@ -358,9 +484,8 @@ void main() {
           .startPicking('ord-10452');
 
       final PickingStep? third = await container.read(
-        pickingStepProvider(
-          PickingStepQuery(taskId: task.id, lineIndex: 2),
-        ).future,
+        pickingStepProvider(PickingStepQuery(taskId: task.id, lineIndex: 2))
+            .future,
       );
       expect(third?.stepNumber, 3);
       expect(third?.product.id, 'p-10');

@@ -141,9 +141,8 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
       GoRoute(
         path: AppRoutes.scanResultPath,
         name: AppRouteNames.scanResult,
-        builder: (BuildContext context, GoRouterState state) => ScanResultPage(
-          barcode: state.uri.queryParameters['barcode'] ?? '',
-        ),
+        builder: (BuildContext context, GoRouterState state) =>
+            ScanResultPage(barcode: state.uri.queryParameters['barcode'] ?? ''),
       ),
 
       // Ürünler (şartname 8. bölüm)
@@ -203,8 +202,12 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
           GoRoute(
             path: 'picking',
             name: AppRouteNames.picking,
-            builder: (BuildContext context, GoRouterState state) =>
-                PickingPage(orderId: state.pathParameters['orderId']!),
+            builder: (BuildContext context, GoRouterState state) => PickingPage(
+              orderId: state.pathParameters['orderId']!,
+              initialLineIndex: int.tryParse(
+                state.uri.queryParameters['line'] ?? '',
+              ),
+            ),
           ),
         ],
       ),
@@ -274,9 +277,8 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
       GoRoute(
         path: AppRoutes.movements,
         name: AppRouteNames.movements,
-        builder: (BuildContext context, GoRouterState state) => MovementsPage(
-          productId: state.uri.queryParameters['productId'],
-        ),
+        builder: (BuildContext context, GoRouterState state) =>
+            MovementsPage(productId: state.uri.queryParameters['productId']),
       ),
       GoRoute(
         path: AppRoutes.notifications,

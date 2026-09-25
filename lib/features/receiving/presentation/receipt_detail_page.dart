@@ -133,8 +133,7 @@ class _Body extends ConsumerWidget {
               label: 'Tamamlanma',
               value: Formatters.dateTime.format(receipt.completedAt!),
             ),
-          if (receipt.note != null)
-            InfoRow(label: 'Not', value: receipt.note!),
+          if (receipt.note != null) InfoRow(label: 'Not', value: receipt.note!),
 
           const SizedBox(height: AppSpacing.xl),
           Divider(height: 1, color: status.border),
@@ -199,7 +198,12 @@ class _OverReceiptNotice extends StatelessWidget {
   }
 }
 
-/// Mal kabul satırı — dokununca yerleştirme ekranı açılır.
+/// Mal kabul satırı — dokununca o kalemin yerleştirme ekranı açılır.
+///
+/// Kabul işlemi kalem kalem yapılır, bu yüzden satırın sonunda "Yerleştir"
+/// yazar: ekranın altında toplu bir düğme yoktur, olmamalı da — tedarikçi
+/// bir ürünü eksik göndermişse o kalem kabul edilmeden diğerleri
+/// bekletilmemeli.
 class _LineRow extends StatelessWidget {
   const _LineRow({required this.receiptId, required this.line});
 
@@ -213,8 +217,7 @@ class _LineRow extends StatelessWidget {
     final bool isDone = data.isCompleted;
 
     return InkWell(
-      onTap: () =>
-          context.push(AppRoutes.putaway(receiptId, line.product.id)),
+      onTap: () => context.push(AppRoutes.putaway(receiptId, line.product.id)),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
         child: Row(
@@ -290,13 +293,10 @@ class _LineRow extends StatelessWidget {
                     color: isDone ? status.success : status.neutral,
                   ),
                 ),
+                // Satır zaten tıklanabilir; etiket ne olacağını yazıyla
+                // söyler.
+                RowAction(label: isDone ? 'Görüntüle' : 'Yerleştir'),
               ],
-            ),
-            const SizedBox(width: AppSpacing.xs),
-            Icon(
-              AppIcons.forward,
-              size: AppSizes.iconSm,
-              color: status.neutral,
             ),
           ],
         ),

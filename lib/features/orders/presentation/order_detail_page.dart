@@ -244,13 +244,23 @@ class _Body extends StatelessWidget {
 
         SectionHeader(
           title: 'Ürünler',
-          subtitle: '${detail.lines.length} çeşit · '
+          subtitle:
+              '${detail.lines.length} çeşit · '
               '${Formatters.quantity(order.totalQuantity, 'adet')}',
           padding: const EdgeInsets.only(bottom: AppSpacing.sm),
         ),
         for (int i = 0; i < detail.lines.length; i++) ...<Widget>[
           if (i > 0) Divider(height: 1, color: status.border),
-          _OrderLineRow(line: detail.lines[i]),
+          _OrderLineRow(
+            line: detail.lines[i],
+            // Toplama görevinin satırları sipariş kalemleriyle aynı sırada
+            // açılır, bu yüzden aynı sıra numarası iki yerde de geçerli.
+            lineIndex: i,
+            orderId: order.id,
+            // Görev açılmadan tek bir kalem toplanamaz; o aşamada ekranın
+            // altındaki "Siparişi Topla" düğmesi tek yoldur.
+            canPick: detail.pickingTask != null,
+          ),
         ],
       ],
     );
@@ -260,9 +270,22 @@ class _Body extends StatelessWidget {
 /// Sipariş satırı: şartnamenin "iPhone 15 × 2" gösterimi, üstüne toplama
 /// durumu ve stok yeterliliği.
 class _OrderLineRow extends StatelessWidget {
-  const _OrderLineRow({required this.line});
+  const _OrderLineRow({
+    required this.line,
+    required this.lineIndex,
+    required this.orderId,
+    required this.canPick,
+  });
 
   final OrderLineDetail line;
+
+  /// Kalemin sırası — "Topla" düğmesi toplama ekranını bu kalemde açar.
+  final int lineIndex;
+
+  final String orderId;
+
+  /// Toplama görevi açılmış mı.
+  final bool canPick;
 
   @override
   Widget build(BuildContext context) {
@@ -369,6 +392,16 @@ class _OrderLineRow extends StatelessWidget {
                     color: isPicked ? status.success : status.neutral,
                   ),
                 ),
+                // Satırın kendisi ürün detayına gider; "Topla" ise doğrudan
+                // bu kalemin toplama adımını açar. Çalışan elindeki koliye
+                // denk gelen kalemden başlayabilmeli.
+                if (canPick && !isPicked)
+                  RowAction(
+                    label: 'Topla',
+                    onPressed: () => context.push(
+                      AppRoutes.picking(orderId, lineIndex: lineIndex),
+                    ),
+                  ),
               ],
             ),
           ],

@@ -116,6 +116,48 @@ void main() {
       expect(find.text('Ürün Yerleştirme'), findsOneWidget);
       expect(find.text('Lokasyon Seç'), findsOneWidget);
     });
+
+    testWidgets('her satır ne yapacağını yazıyla söyler', (
+      WidgetTester tester,
+    ) async {
+      // Sağa bakan bir ok satırın tıklanabildiğini söyler ama ne olacağını
+      // söylemez; ekranın altında toplu bir düğme de yok.
+      await openGr1024(tester);
+
+      expect(
+        find.descendant(
+          of: find.byType(RowAction),
+          matching: find.text('Yerleştir'),
+        ),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.text('Yerleştir'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Ürün Yerleştirme'), findsOneWidget);
+    });
+
+    testWidgets('kabul edilmiş satırda etiket "Görüntüle" olur', (
+      WidgetTester tester,
+    ) async {
+      // Tamamlanmış bir kayıtta yerleştirilecek bir şey kalmamıştır ama
+      // satır yine açılır: çalışan ne aldığını gözden geçirebilmeli.
+      final ProviderContainer container = await openReceiving(tester);
+      final List<GoodsReceipt> receipts = await container.read(
+        receiptsProvider.future,
+      );
+      final GoodsReceipt done = receipts.firstWhere(
+        (GoodsReceipt r) => r.status == ReceiptStatus.completed,
+      );
+
+      await tester.scrollUntilVisible(find.text(done.code), 200);
+      await tester.tap(find.text(done.code));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Görüntüle'), findsWidgets);
+      expect(find.text('Yerleştir'), findsNothing);
+    });
   });
 
   group('Yerleştirme ekranı', () {
@@ -138,9 +180,7 @@ void main() {
       expect(find.text('KALAN'), findsOneWidget);
     });
 
-    testWidgets('varsayılan miktar kalan adettir', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('varsayılan miktar kalan adettir', (WidgetTester tester) async {
       // Depoda en sık yapılan iş gelen malın tamamını kabul etmek.
       await openPutaway(tester);
 
@@ -186,10 +226,7 @@ void main() {
         putawayLocationsProvider('p-01').future,
       );
       expect(options.first.alreadyHoldsProduct, isTrue);
-      expect(
-        options.first.summary.location.code,
-        anyOf('A-01-01', 'B-03-02'),
-      );
+      expect(options.first.summary.location.code, anyOf('A-01-01', 'B-03-02'));
     });
   });
 
@@ -260,7 +297,9 @@ void main() {
           .getStockMovements();
       expect(before.totalQuantity, 24);
 
-      await container.read(warehouseActionsProvider).receiveGoods(
+      await container
+          .read(warehouseActionsProvider)
+          .receiveGoods(
             receiptId: 'gr-1024',
             productId: 'p-01',
             quantity: 50,
@@ -297,7 +336,9 @@ void main() {
         dashboardSummaryProvider.future,
       );
 
-      await container.read(warehouseActionsProvider).receiveGoods(
+      await container
+          .read(warehouseActionsProvider)
+          .receiveGoods(
             receiptId: 'gr-1024',
             productId: 'p-01',
             quantity: 50,
@@ -316,7 +357,9 @@ void main() {
       // Şartname 26: gerçek depoda fazla mal gelebilir, kapıda bekletilemez.
       final ProviderContainer container = makeContainer();
 
-      await container.read(warehouseActionsProvider).receiveGoods(
+      await container
+          .read(warehouseActionsProvider)
+          .receiveGoods(
             receiptId: 'gr-1024',
             productId: 'p-01',
             quantity: 55,
@@ -335,7 +378,9 @@ void main() {
     test('kısmi kabulde kayıt açık kalır', () async {
       final ProviderContainer container = makeContainer();
 
-      await container.read(warehouseActionsProvider).receiveGoods(
+      await container
+          .read(warehouseActionsProvider)
+          .receiveGoods(
             receiptId: 'gr-1024',
             productId: 'p-01',
             quantity: 20,
@@ -381,7 +426,9 @@ void main() {
       );
 
       await expectLater(
-        container.read(warehouseActionsProvider).receiveGoods(
+        container
+            .read(warehouseActionsProvider)
+            .receiveGoods(
               receiptId: 'gr-1024',
               productId: 'p-01',
               quantity: tight.summary.availableCapacity + 1,

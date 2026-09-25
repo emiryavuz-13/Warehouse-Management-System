@@ -36,6 +36,7 @@ abstract final class AppRoutes {
   // --- Mal kabul ve yerleştirme (şartname 11-12. bölümler) ---
   static const String receiving = '/receiving';
   static String receiptDetail(String receiptId) => '/receiving/$receiptId';
+
   /// Yerleştirme ekranı tek bir satır için açılır; ürün sorgu
   /// parametresiyle taşınır.
   static String putaway(String receiptId, String productId) =>
@@ -43,7 +44,15 @@ abstract final class AppRoutes {
 
   // --- Sipariş ve toplama (şartname 13-14. bölümler) ---
   static String orderDetail(String orderId) => '/orders/$orderId';
-  static String picking(String orderId) => '/orders/$orderId/picking';
+
+  /// Toplama ekranı.
+  ///
+  /// [lineIndex] verilirse ekran o kalemde açılır — sipariş detayındaki
+  /// "Topla" düğmesi çalışanı doğrudan ilgilendiği kaleme götürsün diye.
+  /// Verilmezse sıradaki tamamlanmamış kalem gelir.
+  static String picking(String orderId, {int? lineIndex}) => lineIndex == null
+      ? '/orders/$orderId/picking'
+      : '/orders/$orderId/picking?line=$lineIndex';
 
   // --- Transfer (şartname 15. bölüm) ---
   static const String transfer = '/transfer';
